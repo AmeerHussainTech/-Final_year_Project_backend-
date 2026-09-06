@@ -8,7 +8,7 @@ echo.
 
 :: 1. Start Flask Backend
 echo [1/2] Starting Flask Backend Server (Port 5000)...
-start "AI Hub Backend (Port 5000)" cmd /k ".\venv\Scripts\python.exe main.py"
+start "AI Hub Backend (Port 5000)" cmd /k "python main.py"
 
 :: 2. Start React Frontend
 echo [2/2] Starting React Vite Frontend Server (Port 3000)...

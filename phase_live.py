@@ -9,7 +9,7 @@ import base64
 import math
 import re
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 import google.generativeai as genai
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -79,6 +79,14 @@ if GROQ_API_KEY and GROQ_API_KEY != 'your-groq-api-key-here':
 
 # Create Blueprint
 phase_live_bp = Blueprint('phase_live', __name__, url_prefix='/api/presentation')
+
+# ===== SCORING RELIABILITY THRESHOLDS (FIX) =====
+# A single valid frame/audio-chunk is not enough evidence to trust a metric.
+# These minimums prevent one lucky frame or one Whisper hallucination from
+# driving the whole session score.
+MIN_VALID_VIDEO_SAMPLES = 5     # need at least 5 good frames before trusting eye/posture avg
+MIN_VALID_AUDIO_SAMPLES = 3     # need at least 3 good audio chunks before trusting WPM avg
+MIN_WORDS_PER_CHUNK = 2         # Whisper hallucinates 1-word phrases on silence/noise
 
 # ===== REAL-TIME FEATURE EXTRACTION FUNCTIONS =====
 
@@ -159,14 +167,31 @@ def _smooth_visual_scores(eye_contact_score, posture_score, session, face_detect
     prev_eyes = session.metrics.get("eye_contact_scores", [])[-4:]
     prev_postures = session.metrics.get("posture_scores", [])[-4:]
 
-    if prev_eyes:
+    # FIX: If eye contact is zero or low (looking away), drop immediately to zero/low!
+    # Do NOT smooth low scores with past high scores, otherwise zero eye contact is masked.
+    if eye_contact_score < 35:
+        smoothed_eye = eye_contact_score
+    elif prev_eyes:
         avg_prev_eye = sum(prev_eyes) / len(prev_eyes)
-        eye_contact_score = int(0.45 * eye_contact_score + 0.55 * avg_prev_eye)
-    if prev_postures:
-        avg_prev_posture = sum(prev_postures) / len(prev_postures)
-        posture_score = int(0.45 * posture_score + 0.55 * avg_prev_posture)
+        if eye_contact_score < avg_prev_eye:
+            smoothed_eye = int(0.90 * eye_contact_score + 0.10 * avg_prev_eye)
+        else:
+            smoothed_eye = int(0.50 * eye_contact_score + 0.50 * avg_prev_eye)
+    else:
+        smoothed_eye = eye_contact_score
 
-    return eye_contact_score, posture_score
+    if posture_score < 35:
+        smoothed_posture = posture_score
+    elif prev_postures:
+        avg_prev_posture = sum(prev_postures) / len(prev_postures)
+        if posture_score < avg_prev_posture:
+            smoothed_posture = int(0.80 * posture_score + 0.20 * avg_prev_posture)
+        else:
+            smoothed_posture = int(0.50 * posture_score + 0.50 * avg_prev_posture)
+    else:
+        smoothed_posture = posture_score
+
+    return smoothed_eye, smoothed_posture
 
 
 def _visual_result(eye_contact_score, posture_score, hint, emotion=None, session=None, face_detected=True, visibility_score=1.0):
@@ -215,6 +240,7 @@ def _unmeasured_visual_result(hint):
         "eye_contact_score": 0,
         "posture_score": 0,
         "confidence_score": 0,
+        "hint": hint,  # FIX: was missing, so the reason never reached the caller/frontend
         "emotion": "NOT DETECTED",
         "valid": False
     }
@@ -262,18 +288,62 @@ def _analyze_frame_with_mediapipe(img, session=None):
     right_eye_inner = point(362)
     right_eye_outer = point(263)
 
+    left_eye_top = point(159)
+    left_eye_bottom = point(145)
+    right_eye_top = point(386)
+    right_eye_bottom = point(374)
+
     left_eye_width = max(1.0, abs(left_eye_inner[0] - left_eye_outer[0]))
     right_eye_width = max(1.0, abs(right_eye_outer[0] - right_eye_inner[0]))
+    left_eye_height = max(1.0, abs(left_eye_bottom[1] - left_eye_top[1]))
+    right_eye_height = max(1.0, abs(right_eye_bottom[1] - right_eye_top[1]))
+
+    # Eye Aspect Ratio (EAR) - detect closed eyes or looking straight down
+    left_ear = left_eye_height / left_eye_width
+    right_ear = right_eye_height / right_eye_width
+    avg_ear = (left_ear + right_ear) / 2.0
 
     left_iris = [point(i) for i in range(468, 473)]
     right_iris = [point(i) for i in range(473, 478)]
     left_iris_x = sum(p[0] for p in left_iris) / len(left_iris)
     right_iris_x = sum(p[0] for p in right_iris) / len(right_iris)
+    left_iris_y = sum(p[1] for p in left_iris) / len(left_iris)
+    right_iris_y = sum(p[1] for p in right_iris) / len(right_iris)
 
-    left_ratio = (left_iris_x - min(left_eye_outer[0], left_eye_inner[0])) / left_eye_width
-    right_ratio = (right_iris_x - min(right_eye_inner[0], right_eye_outer[0])) / right_eye_width
-    gaze_deviation = (abs(left_ratio - 0.5) + abs(right_ratio - 0.5)) / 2
-    eye_contact_score = _clip_score(100 - (gaze_deviation * 220), 0, 100)
+    # Horizontal iris ratio (0.50 = perfectly centered)
+    left_h_ratio = (left_iris_x - min(left_eye_outer[0], left_eye_inner[0])) / left_eye_width
+    right_h_ratio = (right_iris_x - min(right_eye_inner[0], right_eye_outer[0])) / right_eye_width
+    gaze_h_dev = (abs(left_h_ratio - 0.50) + abs(right_h_ratio - 0.50)) / 2.0
+
+    # Vertical iris ratio (0.42 = looking directly at camera lens; >0.56 = looking down at screen/notes)
+    left_v_ratio = (left_iris_y - min(left_eye_top[1], left_eye_bottom[1])) / left_eye_height
+    right_v_ratio = (right_iris_y - min(right_eye_top[1], right_eye_bottom[1])) / right_eye_height
+    gaze_v_dev = (abs(left_v_ratio - 0.42) + abs(right_v_ratio - 0.42)) / 2.0
+
+    # Head orientation / turn deviation (Nose 1, Chin 152)
+    eye_center_x = (left_eye_outer[0] + right_eye_outer[0]) / 2.0
+    eye_center_y = (left_eye_outer[1] + right_eye_outer[1]) / 2.0
+    eye_span = max(1.0, abs(right_eye_outer[0] - left_eye_outer[0]))
+    face_len = max(1.0, abs(point(152)[1] - point(1)[1]))
+
+    head_yaw_dev = abs(point(1)[0] - eye_center_x) / eye_span
+    head_pitch_dev = abs((point(1)[1] - eye_center_y) / face_len - 0.55)
+
+    # Strict Eye Contact Check: If eyes are closed, looking down at screen/desk, or head turned away:
+    is_looking_away = (
+        avg_ear < 0.16 or
+        left_v_ratio > 0.56 or right_v_ratio > 0.56 or
+        gaze_v_dev > 0.14 or gaze_h_dev > 0.12 or
+        head_yaw_dev > 0.14 or head_pitch_dev > 0.16
+    )
+
+    if is_looking_away:
+        eye_contact_score = 0
+    else:
+        total_dev = (gaze_h_dev * 3.5) + (gaze_v_dev * 4.5) + (head_yaw_dev * 2.5) + (head_pitch_dev * 2.5)
+        eye_contact_score = _clip_score(100 - (total_dev * 200), 0, 100)
+        if total_dev > 0.28:
+            eye_contact_score = max(0, eye_contact_score - 30)
 
     ideal_cx = w / 2
     ideal_cy = h * 0.42
@@ -306,7 +376,10 @@ def _analyze_frame_with_mediapipe(img, session=None):
         else:
             hint = "Sit upright and keep a steady posture."
     elif eye_contact_score < 70:
-        hint = "Look closer to the camera lens for stronger eye contact."
+        if gaze_v_dev > 0.15:
+            hint = "Look up at the camera lens instead of down at your notes."
+        else:
+            hint = "Look closer to the camera lens for stronger eye contact."
     else:
         hint = "Good eye contact and posture!"
 
@@ -378,6 +451,21 @@ def _analyze_frame_with_haar(img, session=None):
         visibility_score = max(0.0, min(1.0, (area_ratio - 0.01) / 0.04))
         horizontal_offset = abs(eye_cx - (fw * 0.5)) / fw
         vertical_offset = abs(eye_cy - (fh * 0.45)) / fh
+
+        # Pupil dark center detection inside eye ROI
+        gaze_dev_roi = 0.0
+        try:
+            eye_crop = face_roi_gray[ey:ey + eh, ex:ex + ew]
+            if eye_crop.size > 0:
+                blurred = cv2.GaussianBlur(eye_crop, (5, 5), 0)
+                _, _, min_loc, _ = cv2.minMaxLoc(blurred)
+                pupil_x, pupil_y = min_loc
+                pupil_h_ratio = pupil_x / float(max(1, ew))
+                pupil_v_ratio = pupil_y / float(max(1, eh))
+                gaze_dev_roi = abs(pupil_h_ratio - 0.50) + abs(pupil_v_ratio - 0.40)
+        except Exception:
+            gaze_dev_roi = 0.15
+
         eye_metrics.append({
             "cx": eye_cx,
             "cy": eye_cy,
@@ -386,26 +474,19 @@ def _analyze_frame_with_haar(img, session=None):
             "visibility": visibility_score,
             "horizontal_offset": min(1.0, horizontal_offset * 2),
             "vertical_offset": min(1.0, vertical_offset * 3),
-            "aspect_ratio": eh / max(1.0, ew)
+            "gaze_dev": gaze_dev_roi
         })
 
-    if len(eye_metrics) == 1:
-        eye = eye_metrics[0]
-        center_alignment = 1.0 - eye["horizontal_offset"]
-        vertical_alignment = 1.0 - eye["vertical_offset"]
-        eye_contact_score = int(_clip_score(
-            100 * (
-                0.45 * eye["visibility"] +
-                0.35 * center_alignment +
-                0.20 * vertical_alignment
-            ),
-            0,
-            100
-        ))
+    avg_gaze_dev = sum(e["gaze_dev"] for e in eye_metrics) / len(eye_metrics)
+    avg_center_offset = sum(e["horizontal_offset"] for e in eye_metrics) / len(eye_metrics)
+
+    # FIX: If gaze deviation is high or eyes are offset from camera center, score MUST be 0!
+    if avg_gaze_dev > 0.12 or avg_center_offset > 0.15 or len(eye_metrics) < 2:
+        eye_contact_score = 0
     else:
+        gaze_penalty = min(80, avg_gaze_dev * 220)
         left_eye, right_eye = sorted(eye_metrics, key=lambda e: e["cx"])
         avg_visibility = (left_eye["visibility"] + right_eye["visibility"]) / 2
-        avg_center_offset = (left_eye["horizontal_offset"] + right_eye["horizontal_offset"]) / 2
         vertical_alignment = 1.0 - min(1.0, abs(left_eye["cy"] - right_eye["cy"]) / max(1.0, fh * 0.08))
         symmetry = (
             min(left_eye["w"], right_eye["w"]) / max(1.0, max(left_eye["w"], right_eye["w"])) +
@@ -415,17 +496,14 @@ def _analyze_frame_with_haar(img, session=None):
         expected_distance = 0.28
         distance_alignment = 1.0 - min(1.0, abs(eye_distance_ratio - expected_distance) / expected_distance)
 
-        eye_contact_score = int(_clip_score(
-            100 * (
-                0.35 * avg_visibility +
-                0.25 * (1.0 - avg_center_offset) +
-                0.20 * vertical_alignment +
-                0.10 * symmetry +
-                0.10 * distance_alignment
-            ),
-            0,
-            100
-        ))
+        base_raw_score = 100 * (
+            0.35 * avg_visibility +
+            0.25 * (1.0 - avg_center_offset) +
+            0.20 * vertical_alignment +
+            0.10 * symmetry +
+            0.10 * distance_alignment
+        )
+        eye_contact_score = int(_clip_score(base_raw_score - gaze_penalty, 0, 100))
 
     face_visibility = max(0.0, min(1.0, (fw * fh) / (w * h)))
 
@@ -539,7 +617,24 @@ def analyze_audio_chunk(base64_audio_data: str, session_id: str = "live", transc
             print(f"🎙️ [LIVE STT RESULT] Transcript: '{transcript}'")
             words = transcript.split()
             word_count = len([w for w in words if w.strip()])
-            
+
+            # ── FIX: Whisper (and most Whisper-family models) is known to
+            # hallucinate short filler phrases ("you", "thank you", "bye")
+            # on silence or background noise. A 1-word transcript from a 3s
+            # chunk is almost never real speech — treat it as unmeasured
+            # instead of letting it produce a fake WPM/score.
+            if word_count < MIN_WORDS_PER_CHUNK:
+                print(f"[LIVE STT WARN] Discarding likely-hallucinated chunk transcript: '{transcript}' ({word_count} word(s)).")
+                return {
+                    "wpm": 0,
+                    "filler_word_detected": False,
+                    "transcript": "",
+                    "filler_count": 0,
+                    "pitch_score": None,
+                    "vocal_sentiment": "Unavailable",
+                    "valid": False
+                }
+
             # Pacing calculation: chunk size is 3 seconds, so WPM = word_count * 20
             wpm = word_count * 20
             
@@ -695,6 +790,7 @@ def init_socketio_events(socketio):
                 "eye_contact": 0,
                 "posture": 0,
                 "confidence": 0,
+                "hint": metrics.get("hint", "Face was not detected."),  # FIX: surface the reason to the UI
                 "emotion": metrics.get("emotion", "NOT DETECTED")
             }, room=request.sid, namespace='/ws/live-session')
             return
@@ -753,7 +849,9 @@ def init_socketio_events(socketio):
         can_interrupt = len(interruptions) < 2
         if can_interrupt and len(interruptions) > 0:
             last_int_time = datetime.fromisoformat(interruptions[-1]["timestamp"])
-            elapsed = (datetime.utcnow() - last_int_time).total_seconds()
+            if last_int_time.tzinfo is None:
+                last_int_time = last_int_time.replace(tzinfo=timezone.utc)
+            elapsed = (datetime.now(timezone.utc) - last_int_time).total_seconds()
             if elapsed < 45:
                 can_interrupt = False
                 
@@ -761,93 +859,121 @@ def init_socketio_events(socketio):
         trigger_by_filler = (total_fillers > 0 and total_fillers % 5 == 0)
         
         wpm_count = len(session.metrics.get("wpm_history", []))
-        trigger_by_interval = wpm_count > 0 and wpm_count % 30 == 0
+        trigger_by_interval = wpm_count > 0 and wpm_count % 25 == 0
         if can_interrupt and (trigger_by_filler or trigger_by_interval):
-            # Generate academic panelist interruption question
+            # Extract speaker's recent transcript context
+            recent_transcripts = session.metrics.get("transcripts", [])[-4:]
+            recent_speech = " ".join(recent_transcripts).strip() if recent_transcripts else session.topic
+
+            # Generate high-level academic professor cross-question
             topic = session.topic
-            question = "Can you expand on how this specific topic impacts long-term scalability?"
-            
+            question = f"Regarding {topic}, how do you validate your methodology against potential edge cases?"
+
             if gemini_available:
                 try:
-                    model = genai.GenerativeModel('gemini-flash-latest')
-                    prompt = f"Ask an insightful, challenging academic panelist question related to the presentation topic: '{topic}'. Keep it to 1 sentence."
+                    model = genai.GenerativeModel(os.getenv('GEMINI_MODEL', 'gemini-3.6-flash'))
+                    prompt = f"""You are Professor Eleanor Vance, a Senior Academic Evaluator and University Defense Chair presiding over a presentation.
+
+PRESENTATION TOPIC: '{topic}'
+SPEAKER'S RECENT WORDS: '{recent_speech}'
+
+Formulate 1 sharp, highly educated, probing cross-examination question directly challenging or probing the speaker's claim, methodology, assumptions, or real-world applicability.
+Your question MUST sound like a tough, inquisitive university professor testing their deep conceptual understanding. Keep it under 25 words."""
                     response = model.generate_content(prompt)
                     question = response.text.strip()
                 except Exception as e:
-                    print(f"[LIVE WARN] Gemini interruption generation failed: {str(e)}")
-            
+                    print(f"[LIVE WARN] Gemini cross-question generation failed: {str(e)}")
+
             # Transition state in DB
             session.update_status("INTERRUPTED_Q&A")
-            
+
             # Log interruption
             int_log = {
                 "question": question,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "answer": None,
                 "score": None
             }
             session.update_metrics("interruptions", int_log)
-            
-            # Emit interruption
+
+            # Emit interruption to frontend
             socketio.emit('interruption_trigger', {
-                "question": question
+                "question": question,
+                "evaluator_name": "Prof. Eleanor Vance",
+                "evaluator_role": "Senior Academic Defense Examiner"
             }, room=request.sid, namespace='/ws/live-session')
 
     @socketio.on('submit_answer', namespace='/ws/live-session')
     def on_submit_answer(data):
         """
-        Receives user answer to panelist interruption and grades it.
+        Receives user answer to panelist cross-question and grades it like a Senior Professor.
         """
         session_id = data.get('session_id')
         answer = data.get('answer', '').strip()
-        
+
         if not session_id or not answer:
             return
-            
+
         session = PresentationSession.get_by_id(session_id)
         if not session or session.status != 'INTERRUPTED_Q&A':
             return
-            
-        # Grade the answer
-        grade_score = None
-        feedback = "Answer recorded. Automated grading was unavailable."
-        
+
+        # Grade the answer like a senior academic examiner
+        grade_score = 75
+        feedback = "Answer recorded. Good effort."
+
         if gemini_available:
             try:
-                model = genai.GenerativeModel('gemini-flash-latest')
+                model = genai.GenerativeModel(os.getenv('GEMINI_MODEL', 'gemini-3.6-flash'))
                 last_interruption = session.metrics["interruptions"][-1]
                 question = last_interruption["question"]
-                
-                grading_prompt = f"""
-                You are an academic examiner. Grade this student's answer to the question: '{question}'.
-                Student Answer: '{answer}'
-                
-                Return a single JSON object (no markdown):
-                {{
-                    "score": <integer 0-100>,
-                    "feedback": "<1 sentence detailed critique>"
-                }}
-                """
+
+                grading_prompt = f"""You are Professor Eleanor Vance, Senior Academic Examiner. Evaluate this student's response to your cross-examination question.
+
+QUESTION: '{question}'
+STUDENT ANSWER: '{answer}'
+
+Evaluate the answer on:
+1. Conceptual accuracy & analytical depth
+2. Use of evidence/examples
+3. Composure & defensive clarity
+
+Return ONLY a single valid JSON object:
+{{
+    "score": <integer 0-100>,
+    "feedback": "<2-sentence articulate critique explaining the score and how to make the answer bulletproof>"
+}}"""
                 response = model.generate_content(
                     grading_prompt,
                     generation_config={"response_mime_type": "application/json"}
                 )
                 res_data = json.loads(response.text)
-                grade_score = int(res_data.get("score", 0))
-                feedback = res_data.get("feedback", "Good response.")
+                grade_score = int(res_data.get("score", 75))
+                feedback = res_data.get("feedback", "Articulate response.")
             except Exception as e:
                 print(f"[LIVE WARN] Gemini grading failed: {str(e)}")
         
-        # Update session logs
-        # Since we use MongoDB list index update
-        db.presentation_sessions.update_one(
-            {"id": session_id, "metrics.interruptions.answer": None},
-            {"$set": {
-                "metrics.interruptions.$.answer": answer,
-                "metrics.interruptions.$.score": grade_score,
-                "metrics.interruptions.$.feedback": feedback
-            }}
-        )
+        # Update session logs — Firestore-compatible approach:
+        # Read the current interruptions list, update the last unanswered entry
+        # in-memory, then write the whole list back.
+        try:
+            ref = db.collection("presentation_sessions").document(session_id)
+            doc = ref.get()
+            if doc.exists:
+                current_interruptions = doc.to_dict().get("metrics", {}).get("interruptions", [])
+                # Find and update the last interruption that has no answer yet
+                for i in range(len(current_interruptions) - 1, -1, -1):
+                    if current_interruptions[i].get("answer") is None:
+                        current_interruptions[i]["answer"] = answer
+                        current_interruptions[i]["score"] = grade_score
+                        current_interruptions[i]["feedback"] = feedback
+                        break
+                ref.update({"metrics.interruptions": current_interruptions})
+                # Keep the in-memory session object in sync
+                if session.metrics:
+                    session.metrics["interruptions"] = current_interruptions
+        except Exception as e:
+            print(f"[LIVE WARN] Failed to update interruption answer in Firestore: {str(e)}")
         
         # Resume streaming status
         session.update_status("STREAMING")
@@ -914,12 +1040,25 @@ def submit_presentation():
         qna_scores = [i["score"] for i in interruptions if i.get("score") is not None]
         avg_qna = avg_or_zero(qna_scores)
 
-        visual_presence = int((avg_eye + avg_posture) / 2) if eye_scores and posture_scores else None
+        # ── FIX: gate each dimension behind a minimum sample count, not just
+        # "list is non-empty". One lucky frame or one hallucinated Whisper
+        # chunk should not be enough evidence to score a whole dimension.
+        has_enough_video = len(eye_scores) >= MIN_VALID_VIDEO_SAMPLES and len(posture_scores) >= MIN_VALID_VIDEO_SAMPLES
+        has_enough_audio = len(wpm_history) >= MIN_VALID_AUDIO_SAMPLES
+
+        visual_presence = int((avg_eye + avg_posture) / 2) if has_enough_video else None
         vocal_delivery = None
-        if wpm_history:
+        if has_enough_audio:
             vocal_delivery = min(100, max(20, 100 - (fillers * 4) - abs(avg_wpm - 140) // 2))
         content_quality = avg_qna if qna_scores else None
 
+        # ===== SCORING FORMULA WITH WEIGHT RENORMALIZATION =====
+        # Base weights: Visual Presence (0.35), Vocal Delivery (0.35), Content / Q&A Quality (0.30).
+        # If any component is unavailable (e.g. no Q&A interruptions occurred or camera was off),
+        # its weight is redistributed proportionally among remaining active components:
+        #   w_i_normalized = w_i / sum(w_active)
+        # Full 3-component case: 0.35/1.0 = 35%, 0.35/1.0 = 35%, 0.30/1.0 = 30%
+        # 2-component visual+vocal case: 0.35/0.70 = 50%, 0.35/0.70 = 50%
         weighted_scores = []
         if visual_presence is not None:
             weighted_scores.append((visual_presence, 0.35))
@@ -929,7 +1068,17 @@ def submit_presentation():
             weighted_scores.append((content_quality, 0.30))
 
         total_weight = sum(weight for _, weight in weighted_scores)
-        overall_execution = int(sum(score * weight for score, weight in weighted_scores) / total_weight) if total_weight else 0
+        if total_weight > 0:
+            # Proportional weight redistribution: sum( score * (w / total_weight) )
+            normalized_scores = [(score, weight / total_weight) for score, weight in weighted_scores]
+            overall_execution = int(round(sum(score * norm_w for score, norm_w in normalized_scores)))
+        else:
+            overall_execution = 0
+
+        # ── FIX: explicit flag for "nothing measurable happened this session"
+        # so the frontend can show "Insufficient data" instead of a bare 0/40
+        # that looks like a real (bad) score.
+        has_any_data = bool(weighted_scores)
         
         # Build full transcript for evaluation
         transcript_full = " ".join(transcripts)
@@ -948,12 +1097,13 @@ def submit_presentation():
                 "avg_qna": avg_qna,
                 "interruptions": interruptions,
                 "overall_execution": overall_execution,
-                "has_visual_metrics": bool(eye_scores and posture_scores),
-                "has_voice_metrics": bool(wpm_history),
+                "has_visual_metrics": has_enough_video,
+                "has_voice_metrics": has_enough_audio,
                 "has_qna_scores": bool(qna_scores)
             }
         )
         report_json["overall_score"] = overall_execution
+        report_json["insufficient_data"] = not has_any_data  # FIX
 
         # Context Memory Matrix: Fetch past reports for this topic to check progress
         past_reports = HistoricalReport.get_by_user_and_topic(user_id, session.topic)
@@ -974,6 +1124,15 @@ def submit_presentation():
                         ("Keep polishing your delivery!" if diff <= 0 else "Great improvements in eye contact and presentation flow!")
             }
 
+        # FIX: don't present a misleading "progress" comparison when this
+        # session (or the prior one) had no real measured data.
+        if not has_any_data:
+            comparison = {
+                "improved": False,
+                "difference": 0,
+                "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+            }
+
         report_json["comparison"] = comparison
         report_json["topic"] = session.topic
         report_json["session_metrics"] = {
@@ -989,9 +1148,11 @@ def submit_presentation():
                 "audio_samples": len(wpm_history),
                 "transcript_segments": len(transcripts),
                 "qna_scores": len(qna_scores),
-                "has_video_metrics": bool(eye_scores and posture_scores),
-                "has_audio_metrics": bool(wpm_history),
-                "has_qna_scores": bool(qna_scores)
+                "has_video_metrics": has_enough_video,
+                "has_audio_metrics": has_enough_audio,
+                "has_qna_scores": bool(qna_scores),
+                "min_video_samples_required": MIN_VALID_VIDEO_SAMPLES,   # FIX
+                "min_audio_samples_required": MIN_VALID_AUDIO_SAMPLES,   # FIX
             }
         }
         

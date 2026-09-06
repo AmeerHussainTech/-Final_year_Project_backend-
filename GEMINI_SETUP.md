@@ -24,15 +24,18 @@ Phase Two has been updated to use **Google Gemini 1.5 Flash API** for real AI-po
 The backend will automatically pick up the new configuration:
 
 ```bash
-cd "d:\FYP FInal"
-.\venv\Scripts\Activate.ps1
+# On Windows:
+.venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
+
 python main.py
 ```
 
 ## 📋 What's New in Phase Two
 
 ### Features
-✅ **Real AI Analysis** - Uses Google Gemini 1.5 Flash model  
+✅ **Real AI Analysis** - Uses Google Gemini 3.6 Flash model (`gemini-3.6-flash` with `gemini-2.5-flash-lite` fallback)  
 ✅ **Secure File Handling** - Temporary files with automatic cleanup  
 ✅ **Privacy Protection** - Files deleted from Gemini servers after processing  
 ✅ **Structured JSON Output** - Consistent, frontend-ready responses  

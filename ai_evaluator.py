@@ -1,6 +1,7 @@
 """
 AI Evaluator Service
 Centralized Google Gemini 1.5 Flash analysis and smart fallbacks for all modules.
+Now includes LanguageTool Cloud grammar pre-pass to enrich the 7Cs analysis.
 """
 
 import os
@@ -9,6 +10,11 @@ import random
 import re
 import google.generativeai as genai
 from dotenv import load_dotenv
+from services.language_tool_service import (
+    check_grammar,
+    summarise_grammar_issues,
+    grammar_score as lt_grammar_score,
+)
 
 # Load env variables
 load_dotenv()
@@ -32,15 +38,48 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
     """
     Evaluates text (document slides, transcripts, or live presentation speech)
     and returns a standardized 7Cs scorecard.
-    
+
+    Now includes a LanguageTool Cloud grammar pre-pass:
+    - Detects specific grammar/spelling errors before calling Gemini.
+    - Injects the error list into the Gemini prompt for richer corrections.
+    - Adds 'grammar_issues' and 'grammar_score' fields to the returned report.
+
     module_type options: 'document', 'speech', 'live'
     """
     # Safeguard text input
     if not text or not text.strip():
         text = "No content provided."
 
+    # ===== STEP 0: GRAMMAR PRE-PASS (LanguageTool Cloud API) =====
+    # Run only for document and speech modules (not live — transcript is too fragmented)
+    grammar_issues = []
+    grammar_summary_text = ""
+    computed_grammar_score = 100
+
+    # ===== STEP 0: GRAMMAR PRE-PASS (LanguageTool Cloud API) =====
+    # Runs for ALL module types: document, speech, and live transcript.
+    grammar_issues = []
+    grammar_summary_text = ""
+    computed_grammar_score = 100
+
+    try:
+        grammar_issues = check_grammar(text)
+        word_count_for_grammar = len(text.split())
+        computed_grammar_score = lt_grammar_score(grammar_issues, word_count_for_grammar)
+        grammar_summary_text = summarise_grammar_issues(grammar_issues)
+        if grammar_issues:
+            print(f"[GRAMMAR] LanguageTool detected {len(grammar_issues)} issues (module={module_type}). Grammar score: {computed_grammar_score}/100")
+        else:
+            print(f"[GRAMMAR] LanguageTool: No grammar issues detected (module={module_type}).")
+    except Exception as _ge:
+        print(f"[GRAMMAR WARN] Grammar pre-pass failed: {_ge}. Continuing without grammar data.")
+        grammar_issues = []
+        grammar_summary_text = ""
+        computed_grammar_score = 100
+
     # ===== BUILD DYNAMIC FALLBACK RESPONSE =====
     fallback_json = {}
+    insufficient_live_data = False  # FIX: Initialize before any if/elif that references it
     
     if module_type == 'document':
         filename = context_metrics.get("filename", "presentation.pdf")
@@ -99,6 +138,20 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
                     "Audience_Alignment": max(20, overall_score - 9),
                     "Purpose_Fulfillment": max(20, overall_score - 5)
                 },
+                "context_analysis": {
+                    "context_accuracy_score": max(30, overall_score - 5),
+                    "is_context_accurate": False,
+                    "factual_correctness_summary": "The document shows contextual gaps and informal phrasing. Information lacks rigorous evidence and clear domain alignment.",
+                    "inaccuracies_detected": [
+                        "Vague or unsupported claims in text body.",
+                        "Lacks verifiable data points or specific domain context."
+                    ],
+                    "context_based_changes": [
+                        "Verify and replace informal statements with precise domain terminology.",
+                        "Add factual evidence, citations, or quantitative metrics to support claims.",
+                        "Ensure logical continuity between introduction and conclusion slides."
+                    ]
+                },
                 "seven_cs_evaluation": {
                     "Clear": "The core message is obscured by poor phrasing and disorganized flow.",
                     "Concise": "The document is either too brief to convey meaning, or cluttered with redundant thoughts.",
@@ -153,6 +206,18 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
                     "Tone_Appropriateness": min(100, overall_score + 6),
                     "Audience_Alignment": min(100, overall_score + 1),
                     "Purpose_Fulfillment": min(100, overall_score + 2)
+                },
+                "context_analysis": {
+                    "context_accuracy_score": min(100, overall_score + 3),
+                    "is_context_accurate": True,
+                    "factual_correctness_summary": "The presentation content aligns logically with the topic domain. Statements and concepts are contextualized accurately with clear presentation flow.",
+                    "inaccuracies_detected": [
+                        "No major factual inaccuracies or context contradictions detected."
+                    ],
+                    "context_based_changes": [
+                        "Consider backing up key statements with concrete citations or numerical metrics.",
+                        "Sharpen technical terminology in body slides to ensure full domain precision."
+                    ]
                 },
                 "seven_cs_evaluation": {
                     "Clear": "The main points are clearly laid out and easy to follow.",
@@ -209,14 +274,7 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
         
         fallback_json = {
             "overall_score": overall_score,
-            "category_scores": {
-                "Structure": max(30, overall_score - 2),
-                "Clarity": max(30, overall_score - 5),
-                "Persuasion": max(30, overall_score - 4),
-                "Content_Quality": max(30, overall_score - 8),
-                "Call_to_Action": max(30, overall_score - 10)
-            },
-            "seven_cs_evaluation": {
+                "seven_cs_evaluation": {
                 "Clear": "The speaking pace supports a reasonably clear delivery.",
                 "Concise": f"Filler words count is {filler_count} ({filler_percentage:.1f}%), which affects conciseness.",
                 "Correct": "The speech follows general grammatical rules.",
@@ -260,6 +318,10 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
         has_qna_scores = context_metrics.get("has_qna_scores", False)
         
         overall_score = context_metrics.get("overall_execution", 0)
+
+        # FIX: kuch bhi measure nahi hua to Gemini ko hallucinate karne ka
+        # mauka hi mat do — call skip kr do
+        insufficient_live_data = not has_visual_metrics and not has_voice_metrics and not has_qna_scores
         
         strengths_list = []
         recs_list = []
@@ -320,39 +382,48 @@ def evaluate_7cs(text: str, module_type: str, context_metrics: dict) -> dict:
             "Consistent": f"Visual focus and body posture remained consistent (posture: {avg_posture}%) during delivery." if has_visual_metrics else "Consistency could not be scored from visual metrics because no valid video samples were captured."
         }
         
-        fallback_json = {
-            "overall_score": overall_score,
-            "category_scores": {
-                "Structure": max(30, overall_score - 2),
-                "Clarity": max(30, overall_score - 5),
-                "Persuasion": max(30, overall_score - 4),
-                "Content_Quality": max(30, overall_score - 8),
-                "Call_to_Action": max(30, overall_score - 10)
-            },
-            "seven_cs_evaluation": seven_cs_eval,
-            "seven_cs_scores": {
-                "Clear": min(100, max(0, avg_eye - 5)) if has_visual_metrics else 0,
-                "Concise": min(100, max(0, 100 - (fillers * 6))) if has_voice_metrics else 0,
-                "Correct": 0 if not text.strip() else 85,
-                "Complete": 0 if not text.strip() and num_interruptions == 0 else (80 if num_interruptions == 0 else 90),
-                "Courteous": 90 if has_visual_metrics else 0,
-                "Concrete": (75 if fillers > 3 else 85) if has_voice_metrics else 0,
-                "Consistent": 80 if has_visual_metrics else 0
-            },
-            "strengths": strengths_list,
-            "recommendations": recs_list,
-            "qna_analysis": qna_feedback,
-            "improved_text": text
-        }
+    if insufficient_live_data:
+            fallback_json = {
+                "overall_score": 0,
+                "category_scores": {
+                    "Structure": 0, "Clarity": 0, "Persuasion": 0,
+                    "Content_Quality": 0, "Call_to_Action": 0
+                },
+                "seven_cs_evaluation": {
+                    c: "Not scored — no camera or microphone data was captured for this session."
+                    for c in ["Clear", "Concise", "Correct", "Complete", "Courteous", "Concrete", "Consistent"]
+                },
+                "seven_cs_scores": {
+                    c: 0 for c in ["Clear", "Concise", "Correct", "Complete", "Courteous", "Concrete", "Consistent"]
+                },
+                "strengths": [],
+                "recommendations": [
+                    "Turn on your camera and microphone before starting the session.",
+                    "Speak clearly and stay in frame so eye contact and posture can be tracked."
+                ],
+                "qna_analysis": "No panelist interruptions occurred during this session.",
+                "detailed_feedback": "No usable video or audio data was captured during this session, so no delivery score could be generated. Check your camera and microphone permissions and try again.",
+                "improved_text": "No speech was captured during this session."
+            }
 
     # ===== BUILD DYNAMIC PROMPT FOR GEMINI =====
     analysis_prompt = ""
-    
     if module_type == 'document':
         filename = context_metrics.get("filename", "presentation.pdf")
+        # Attach grammar pre-pass summary if available
+        grammar_section = f"""
+
+--- GRAMMAR PRE-ANALYSIS (LanguageTool Cloud) ---
+Grammar Quality Score: {computed_grammar_score}/100
+Total Grammar/Spelling Issues Detected: {len(grammar_issues)}
+{grammar_summary_text if grammar_summary_text else 'No grammar issues detected — text appears grammatically clean.'}
+--- END GRAMMAR PRE-ANALYSIS ---
+""" if grammar_issues or computed_grammar_score < 100 else ""
+
         analysis_prompt = f"""
 You are an expert presentation coach and communications consultant. Your job is to analyze the following presentation text/slides, identify all errors, grammatical mistakes, structural weaknesses, and assess how well it adheres to the 7 Cs of Communication (Clear, Concise, Correct, Complete, Courteous, Concrete, Consistent).
 
+IMPORTANT: A grammar pre-analysis has already been performed using LanguageTool. The grammar quality score is {computed_grammar_score}/100. Use this data to calibrate the 'Correct' dimension and Grammar_and_Syntax category score accurately.{grammar_section}
 Then, generate a comprehensive report in JSON format.
 Your response MUST be a single, valid JSON object matching the schema below. Do not wrap the JSON in markdown code blocks (e.g. ```json).
 
@@ -366,16 +437,29 @@ JSON Schema:
     "Persuasion": <score 0-100 based on argumentation quality and focus>,
     "Content_Quality": <score 0-100 based on depth, analysis, and facts>,
     "Call_to_Action": <score 0-100 based on presence and clarity of next steps/concluding goals>,
-    "Grammar_and_Syntax": <score 0-100 based on grammar, formatting correctness, and spelling>,
+    "Grammar_and_Syntax": {computed_grammar_score},
     "Accuracy": <score 0-100 based on accuracy of statements, information, and logic>,
     "Tone_Appropriateness": <score 0-100 based on professional tone, respectfulness, and suitability>,
     "Audience_Alignment": <score 0-100 based on how well target audience needs are addressed>,
     "Purpose_Fulfillment": <score 0-100 based on achieving the presentation's primary goals>
   }},
+  "context_analysis": {{
+    "context_accuracy_score": <integer 0-100 indicating factual and logical accuracy of information in context>,
+    "is_context_accurate": <boolean true if context/facts are valid and accurate, false if errors found>,
+    "factual_correctness_summary": "<1-2 sentence explanation evaluating if the information and claims are factually/contextually correct or incorrect>",
+    "inaccuracies_detected": [
+      "<specific wrong, inaccurate, or misleading statement/claim 1 if any, or state 'No factual inaccuracies detected'>",
+      "<specific wrong or inaccurate claim 2 if any>"
+    ],
+    "context_based_changes": [
+      "<specific recommended change 1 to fix wrong information and align content with correct context>",
+      "<specific recommended change 2 to fix wrong information and align content with correct context>"
+    ]
+  }},
   "seven_cs_evaluation": {{
     "Clear": "<1-2 sentence detailed evaluation on how clear the message and goals are>",
     "Concise": "<1-2 sentence detailed evaluation on whether it avoids fluff and redundant words>",
-    "Correct": "<1-2 sentence detailed evaluation on grammar, spelling, facts, and formal tone>",
+    "Correct": "<1-2 sentence detailed evaluation on grammar, spelling, facts, and formal tone — reference the {len(grammar_issues)} grammar issues found>",
     "Complete": "<1-2 sentence detailed evaluation on whether key slides/components are present>",
     "Courteous": "<1-2 sentence detailed evaluation on tone, professional level, and audience suitability>",
     "Concrete": "<1-2 sentence detailed evaluation on support by facts, metrics, or specific examples>",
@@ -384,7 +468,7 @@ JSON Schema:
   "seven_cs_scores": {{
     "Clear": <integer 0-100 based on clarity evaluation>,
     "Concise": <integer 0-100 based on conciseness evaluation>,
-    "Correct": <integer 0-100 based on correctness evaluation>,
+    "Correct": {computed_grammar_score},
     "Complete": <integer 0-100 based on completeness evaluation>,
     "Courteous": <integer 0-100 based on courteousness evaluation>,
     "Concrete": <integer 0-100 based on concreteness evaluation>,
@@ -400,7 +484,7 @@ JSON Schema:
     "<detailed recommendation 2 with slide reference>",
     "<detailed recommendation 3 with slide reference>"
   ],
-  "detailed_feedback": "<2-3 paragraph comprehensive analysis pointing out specific flaws, formatting issues, structure, and suggestions>",
+  "detailed_feedback": "<2-3 paragraph comprehensive analysis pointing out specific flaws, formatting issues, structure, and suggestions — mention grammar score of {computed_grammar_score}/100>",
   "improved_text": "<Complete, professional rewrite of the document content. Correct all errors, structure with clear slide headings, and present as a read-ready speech script.>"
 }}
 
@@ -414,10 +498,21 @@ Original Presentation Text to Analyze:
         filler_percentage = context_metrics.get("filler_percentage", 0.0)
         repetition_count = context_metrics.get("repetition_count", 0)
         duration_seconds = context_metrics.get("duration_seconds", 0)
-        
+
+        # Attach grammar pre-pass summary if available
+        grammar_section = f"""
+
+--- GRAMMAR PRE-ANALYSIS (LanguageTool Cloud) ---
+Grammar Quality Score: {computed_grammar_score}/100
+Total Grammar/Spelling Issues Detected: {len(grammar_issues)}
+{grammar_summary_text if grammar_summary_text else 'No grammar issues detected — transcript appears grammatically clean.'}
+--- END GRAMMAR PRE-ANALYSIS ---
+""" if grammar_issues or computed_grammar_score < 100 else ""
+
         analysis_prompt = f"""
 You are an expert presentation coach and public speaking/communication consultant. Your job is to analyze the following speech transcript, identify all errors, grammatical mistakes, verbal pacing issues, and assess how well it adheres to the 7 Cs of Communication (Clear, Concise, Correct, Complete, Courteous, Concrete, Consistent).
 
+IMPORTANT: A grammar pre-analysis has already been performed using LanguageTool. The grammar quality score is {computed_grammar_score}/100 based on {len(grammar_issues)} detected issues. Use this data to calibrate the 'Correct' dimension accurately.{grammar_section}
 We have also calculated the following real-time speaking metrics from the audio recording for your context:
 - Speaking pace: {speech_speed_wpm} WPM (optimal: 120-160 WPM)
 - Filler words count: {filler_count} instances (filler percentage: {filler_percentage:.1f}%)
@@ -440,7 +535,7 @@ JSON Schema:
   "seven_cs_evaluation": {{
     "Clear": "<1-2 sentence evaluation on the clarity of the speech message>",
     "Concise": "<1-2 sentence evaluation on wordiness, pacing, and filler word usage>",
-    "Correct": "<1-2 sentence evaluation on grammatical accuracy, pronunciation hints, and language suitability>",
+    "Correct": "<1-2 sentence evaluation on grammatical accuracy — reference the {len(grammar_issues)} grammar issues detected by LanguageTool (score: {computed_grammar_score}/100)>",
     "Complete": "<1-2 sentence evaluation on whether the main point was thoroughly covered in the given duration>",
     "Courteous": "<1-2 sentence evaluation on professional tone, respectfulness, and reader-suitability>",
     "Concrete": "<1-2 sentence evaluation on focus, usage of specific details, data, or illustrative points>",
@@ -449,7 +544,7 @@ JSON Schema:
   "seven_cs_scores": {{
     "Clear": <integer 0-100 based on clarity evaluation>,
     "Concise": <integer 0-100 based on conciseness evaluation>,
-    "Correct": <integer 0-100 based on correctness evaluation>,
+    "Correct": {computed_grammar_score},
     "Complete": <integer 0-100 based on completeness evaluation>,
     "Courteous": <integer 0-100 based on courteousness evaluation>,
     "Concrete": <integer 0-100 based on concreteness evaluation>,
@@ -465,7 +560,7 @@ JSON Schema:
     "<actionable recommendations/corrections 2 with specific detail>",
     "<actionable recommendations/corrections 3 with specific detail>"
   ],
-  "detailed_feedback": "<2-3 paragraph comprehensive analysis pointing out specific vocal flaws, grammar issues, pacing problems, and recommendations>",
+  "detailed_feedback": "<2-3 paragraph comprehensive analysis pointing out specific vocal flaws, grammar issues (mention grammar score {computed_grammar_score}/100), pacing problems, and recommendations>",
   "improved_text": "<Complete, professional rewrite of the transcript. Remove all filler words (um, like, basically), repetitions, correct any grammatical errors, and format it with clear structural headings. This rewrite must be fully written out and ready to read aloud.>"
 }}
 
@@ -473,7 +568,7 @@ Original Speech Transcript to Analyze:
 {text}
 """
         
-    elif module_type == 'live':
+    elif module_type == 'live' and not insufficient_live_data:
         topic = context_metrics.get("topic", "General Topic")
         avg_eye = context_metrics.get("avg_eye", 0)
         avg_posture = context_metrics.get("avg_posture", 0)
@@ -481,10 +576,21 @@ Original Speech Transcript to Analyze:
         fillers = context_metrics.get("fillers", 0)
         avg_qna = context_metrics.get("avg_qna", 0)
         overall_score = context_metrics.get("overall_execution", 0)
-        
+
+        # Attach grammar pre-pass summary for live transcript
+        grammar_section = f"""
+
+--- GRAMMAR PRE-ANALYSIS (LanguageTool Cloud) ---
+Grammar Quality Score: {computed_grammar_score}/100
+Total Grammar/Spelling Issues Detected: {len(grammar_issues)}
+{grammar_summary_text if grammar_summary_text else 'No grammar issues detected — transcript appears grammatically clean.'}
+--- END GRAMMAR PRE-ANALYSIS ---
+""" if grammar_issues or computed_grammar_score < 100 else ""
+
         analysis_prompt = f"""
 You are an expert presentation coach and public speaking/communication consultant. Your job is to analyze this live presentation summary and transcript, scoring the performance out of 100 based on the 7 Cs (Clear, Concise, Correct, Complete, Courteous, Concrete, Consistent).
 
+IMPORTANT: A grammar pre-analysis has already been performed on the transcript using LanguageTool. Grammar score: {computed_grammar_score}/100 ({len(grammar_issues)} issues found). Use this to calibrate the 'Correct' dimension accurately.{grammar_section}
 Presentation Context:
 - Topic: {topic}
 - Full Transcript: {text}
@@ -509,7 +615,7 @@ JSON Schema:
     "seven_cs_evaluation": {{
         "Clear": "<1-2 sentence detailed evaluation based on eye contact and clarity of delivery>",
         "Concise": "<1-2 sentence detailed evaluation based on verbal pacing and filler word usage>",
-        "Correct": "<1-2 sentence detailed evaluation on grammatical accuracy and professional pronunciation>",
+        "Correct": "<1-2 sentence evaluation on grammatical accuracy — reference grammar score {computed_grammar_score}/100 ({len(grammar_issues)} issues)>",
         "Complete": "<1-2 sentence detailed evaluation on topic coverage and response to panel questions>",
         "Courteous": "<1-2 sentence detailed evaluation on posture, examiner courtesy, and presenter demeanor>",
         "Concrete": "<1-2 sentence detailed evaluation on directness of answers and specificity of transcript content>",
@@ -518,7 +624,7 @@ JSON Schema:
     "seven_cs_scores": {{
         "Clear": <score 0-100>,
         "Concise": <score 0-100>,
-        "Correct": <score 0-100>,
+        "Correct": {computed_grammar_score},
         "Complete": <score 0-100>,
         "Courteous": <score 0-100>,
         "Concrete": <score 0-100>,
@@ -530,19 +636,19 @@ JSON Schema:
         "<strength 3>"
     ],
     "recommendations": [
-        "<improvement advice 1 regarding pacing, fillers or panel answers>",
+        "<improvement advice 1 regarding grammar, pacing, fillers or panel answers>",
         "<improvement advice 2>",
         "<improvement advice 3>"
     ],
     "qna_analysis": "<1-2 sentences evaluating student responses to interruptions>",
-    "improved_text": "<Complete professional rewrite of the transcript. Clean up filler words, repetitions, correct any grammar, structure with headings, and present as a read-ready speech script.>"
+    "improved_text": "<Complete professional rewrite of the transcript. Clean up filler words, repetitions, correct all {len(grammar_issues)} grammar issues, structure with headings, and present as a read-ready speech script.>"
 }}
 """
 
     # ===== RUN GEMINI INVOCATION =====
     if gemini_available and analysis_prompt:
         try:
-            model = genai.GenerativeModel('gemini-flash-latest')
+            model = genai.GenerativeModel(os.getenv('GEMINI_MODEL', 'gemini-3.6-flash'))
             response = model.generate_content(
                 analysis_prompt,
                 generation_config={
@@ -552,16 +658,44 @@ JSON Schema:
                 }
             )
             analysis_json = json.loads(response.text)
-            
+
             # Ensure document_name is set for document analysis
             if module_type == 'document' and 'document_name' not in analysis_json:
                 analysis_json['document_name'] = context_metrics.get("filename", "presentation.pdf")
-                
+
+            # ===== ATTACH GRAMMAR DATA TO ALL MODULE RESPONSES =====
+            # grammar_score and grammar_issues are always attached so the
+            # frontend can show a grammar breakdown for every analysis type.
+            analysis_json['grammar_score']  = computed_grammar_score
+            analysis_json['grammar_issues'] = grammar_issues
+            analysis_json['grammar_issues_count'] = len(grammar_issues)
+            # Override Correct score with LanguageTool's authoritative value
+            if 'seven_cs_scores' in analysis_json:
+                analysis_json['seven_cs_scores']['Correct'] = computed_grammar_score
+            if 'category_scores' in analysis_json and 'Grammar_and_Syntax' in analysis_json['category_scores']:
+                analysis_json['category_scores']['Grammar_and_Syntax'] = computed_grammar_score
+
             return analysis_json
         except Exception as e:
             print(f"⚠️ Global AI Evaluator: Gemini call failed ({str(e)}). Falling back to smart heuristics.")
+            # Attach grammar data to fallback — all module types
+            fallback_json['grammar_score']  = computed_grammar_score
+            fallback_json['grammar_issues'] = grammar_issues
+            fallback_json['grammar_issues_count'] = len(grammar_issues)
+            if 'seven_cs_scores' in fallback_json:
+                fallback_json['seven_cs_scores']['Correct'] = computed_grammar_score
+            if 'category_scores' in fallback_json and 'Grammar_and_Syntax' in fallback_json['category_scores']:
+                fallback_json['category_scores']['Grammar_and_Syntax'] = computed_grammar_score
             return fallback_json
     else:
+        # Attach grammar data to fallback when Gemini is not available — all module types
+        fallback_json['grammar_score']  = computed_grammar_score
+        fallback_json['grammar_issues'] = grammar_issues
+        fallback_json['grammar_issues_count'] = len(grammar_issues)
+        if 'seven_cs_scores' in fallback_json:
+            fallback_json['seven_cs_scores']['Correct'] = computed_grammar_score
+        if 'category_scores' in fallback_json and 'Grammar_and_Syntax' in fallback_json['category_scores']:
+            fallback_json['category_scores']['Grammar_and_Syntax'] = computed_grammar_score
         return fallback_json
 
 
@@ -630,7 +764,7 @@ Version 2 Text:
 
     if gemini_available:
         try:
-            model = genai.GenerativeModel('gemini-flash-latest')
+            model = genai.GenerativeModel(os.getenv('GEMINI_MODEL', 'gemini-3.6-flash'))
             response = model.generate_content(
                 compare_prompt,
                 generation_config={

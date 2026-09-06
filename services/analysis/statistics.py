@@ -11,17 +11,16 @@ Computes quantitative statistics about a presentation:
 
 import logging
 import math
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from typing import Optional
 
-logger = logging.getLogger(__name__)
+from services.config import (
+    READING_WORDS_PER_MINUTE,
+    SPEAKING_WORDS_PER_MINUTE,
+    SECONDS_PER_SLIDE,
+)
 
-# Average reading speed: ~200-250 words per minute for presentations
-WORDS_PER_MINUTE = 220
-# Average speaking speed: ~140-160 words per minute
-SPEAKING_WORDS_PER_MINUTE = 150
-# Average time per slide for presenter to explain (~30-60 seconds)
-SECONDS_PER_SLIDE = 45
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -219,7 +218,7 @@ def compute_presentation_statistics(slides: list[dict]) -> PresentationStatistic
 
     slide_count = len(slides)
     avg_words = round(total_words / max(slide_count, 1), 1)
-    reading_time_sec = max(1, math.ceil((total_words / WORDS_PER_MINUTE) * 60))
+    reading_time_sec = max(1, math.ceil((total_words / READING_WORDS_PER_MINUTE) * 60))
     speaking_time_sec = max(1, math.ceil((total_words / SPEAKING_WORDS_PER_MINUTE) * 60))
     est_duration_sec = max(
         speaking_time_sec,

@@ -22,6 +22,7 @@ from services.analysis.consistency import ConsistencyAnalyzer
 from services.analysis.duplicate_detector import DuplicateDetector
 from services.analysis.accessibility import AccessibilityAnalyzer
 from services.analysis.speaker import SpeakerAnalyzer
+from services.analysis.context_verifier import verify_internal_context_consistency
 
 __all__ = [
     "compute_presentation_statistics",
@@ -34,5 +35,6 @@ __all__ = [
     "DuplicateDetector",
     "AccessibilityAnalyzer",
     "SpeakerAnalyzer",
+    "verify_internal_context_consistency",
 ]
 

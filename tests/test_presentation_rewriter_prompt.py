@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from presentation_rewriter import build_gemini_prompt
+from services.gemini_service import build_rewrite_prompt as build_gemini_prompt
 
 
 def test_build_gemini_prompt_handles_json_example_without_format_errors():

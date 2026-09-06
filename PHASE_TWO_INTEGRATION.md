@@ -172,9 +172,9 @@ CRITICAL INSTRUCTIONS:
         # 3. Guarantees schema consistency across all API calls
         # 4. Makes error handling more robust and predictable
         
-        print(f"🤖 Generating analysis with Gemini 1.5 Flash...")
+        print(f"🤖 Generating analysis with Gemini 3.6 Flash...")
         
-        model = genai.GenerativeModel('gemini-flash-latest')
+        model = genai.GenerativeModel('gemini-3.6-flash')
         
         response = model.generate_content(
             [analysis_prompt, uploaded_file],

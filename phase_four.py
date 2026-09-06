@@ -7,7 +7,7 @@ import os
 import tempfile
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from groq import Groq
@@ -48,6 +48,8 @@ def run_gemini_speech_analysis(
             "duration_seconds": duration_seconds
         }
     )
+
+from services.rate_limiter import rate_limit, enforce_guest_size_limit
 
 # Create blueprint
 phase_four_bp = Blueprint('phase_four', __name__, url_prefix='/api')
@@ -130,6 +132,7 @@ def analyze_speech_quality(
 
 @phase_four_bp.route('/analyze-speech', methods=['POST'])
 @jwt_required(optional=True)
+@rate_limit(limit_authenticated=15, limit_guest=3)
 def analyze_speech():
     """
     Endpoint to analyze raw speech text (backward compatibility).
@@ -201,11 +204,14 @@ def analyze_speech():
             "category_scores": gemini_result.get("category_scores"),
             "seven_cs_evaluation": gemini_result.get("seven_cs_evaluation"),
             "seven_cs_scores": gemini_result.get("seven_cs_scores"),
+            "grammar_score": gemini_result.get("grammar_score", 100),
+            "grammar_issues": gemini_result.get("grammar_issues", []),
+            "grammar_issues_count": gemini_result.get("grammar_issues_count", 0),
             "strengths": gemini_result.get("strengths"),
             "recommendations": gemini_result.get("recommendations"),
             "detailed_feedback": gemini_result.get("detailed_feedback"),
             "improved_text": gemini_result.get("improved_text"),
-            "analysis_timestamp": datetime.utcnow().isoformat()
+            "analysis_timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         # Save to database if requested
@@ -228,14 +234,19 @@ def analyze_speech():
 
 @phase_four_bp.route('/analyze-audio', methods=['POST'])
 @jwt_required(optional=True)
+@rate_limit(limit_authenticated=15, limit_guest=3)
 def analyze_audio():
     """
     Analyze uploaded WAV/MP3 speech audio:
     1. Transcribe audio to text using Groq Whisper.
     2. Analyze pacing, repetitions, and filler words.
     3. Evaluate text transcript under the 7Cs parameters using Gemini.
-    4. Save upload and report to MongoDB.
+    4. Save upload and report to database.
     """
+    guest_check = enforce_guest_size_limit(max_guest_bytes=10 * 1024 * 1024)
+    if guest_check:
+        return guest_check
+
     temp_file_path = None
     
     try:
@@ -255,6 +266,14 @@ def analyze_audio():
                 "message": "Please select a file to upload"
             }), 400
             
+        ALLOWED_AUDIO_EXTENSIONS = {'.wav', '.mp3', '.m4a', '.ogg', '.webm', '.flac'}
+        file_ext = os.path.splitext(file.filename)[1].lower()
+        if file_ext not in ALLOWED_AUDIO_EXTENSIONS:
+            return jsonify({
+                "error": "Unsupported audio format",
+                "message": f"Supported audio formats: {', '.join(sorted(ALLOWED_AUDIO_EXTENSIONS))}"
+            }), 400
+
         if duration_seconds <= 0:
             return jsonify({
                 "error": "Invalid duration",
@@ -266,6 +285,7 @@ def analyze_audio():
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
             temp_file_path = temp_file.name
             file.save(temp_file_path)
+            print(f"📦 Saved audio file size: {os.path.getsize(temp_file_path)} bytes")  # ← ye add karo
             
         # ===== STEP 2: TRANSCRIBE AUDIO (Groq Whisper API) =====
         transcript = ""
@@ -348,7 +368,7 @@ def analyze_audio():
             "recommendations": gemini_result.get("recommendations"),
             "detailed_feedback": gemini_result.get("detailed_feedback"),
             "improved_text": gemini_result.get("improved_text"),
-            "analysis_timestamp": datetime.utcnow().isoformat()
+            "analysis_timestamp": datetime.now(timezone.utc).isoformat()
         }
         
         # ===== STEP 6: SAVE TO MONGO =====

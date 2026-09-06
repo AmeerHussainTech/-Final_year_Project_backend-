@@ -101,23 +101,28 @@ class TestPresentationRewriterProduction(unittest.TestCase):
         self.assertEqual(rewritten[0]["textboxes"][0]["paragraphs"][0], "We cannot miss this opportunity.")
 
     def test_grammar_check_handles_matches_without_rule_id(self):
-        class FakeMatch:
-            def __init__(self):
-                self.message = 'Missing article'
-                self.context = 'the project manager'
-                self.offset = 0
-                self.errorLength = 4
-                self.replacements = ['the project manager']
+        fake_response = type('FakeResponse', (), {
+            'raise_for_status': lambda self: None,
+            'json': lambda self: {
+                'matches': [{
+                    'rule': {'category': {'name': 'Grammar'}},
+                    'message': 'Missing article',
+                    'context': {'text': 'the project manager'},
+                    'offset': 0,
+                    'length': 4,
+                    'replacements': [{'value': 'the project manager'}]
+                }]
+            }
+        })()
 
-        fake_tool = type('FakeTool', (), {'check': lambda self, text: [FakeMatch()]})()
-
-        with patch('services.language_tool_service._get_tool', return_value=fake_tool):
+        with patch('requests.post', return_value=fake_response):
             matches = check_grammar('This is a test sentence for grammar checking.')
             summary = summarise_grammar_issues(matches)
 
         self.assertEqual(len(matches), 1)
-        self.assertEqual(matches[0]['rule_id'], None)
+        self.assertEqual(matches[0]['rule_id'], 'unknown')
         self.assertIn('Missing article', summary)
+
 
     def test_pptx_extraction_and_preservation(self):
         slides_data = extract_slides(self.sample_pptx_file)

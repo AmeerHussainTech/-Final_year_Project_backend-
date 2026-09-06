@@ -119,8 +119,12 @@ const Analytics: React.FC = () => {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  const documentReports = sortedReports.filter((r) => r.report_type === 'document_analysis');
-  const speechReports = sortedReports.filter((r) => r.report_type === 'speech_analysis' || r.report_type === 'live_coaching');
+  const documentReports = sortedReports.filter(
+    (r) => r.report_type === 'document_analysis' || r.report_type === 'presentation_analysis' || r.report_type === 'presentation_rewrite'
+  );
+  const speechReports = sortedReports.filter(
+    (r) => r.report_type === 'speech_analysis' || r.report_type === 'live_coaching'
+  );
 
   // 1. Overall Score History Data
   const scoreHistoryData: ChartDataPoint[] = sortedReports.map((r) => {
@@ -130,14 +134,15 @@ const Analytics: React.FC = () => {
     });
     
     // Check if score exists in document or speech report json
-    const score = r.report_type === 'document_analysis'
-      ? r.report_json.overall_score
+    const isDoc = r.report_type === 'document_analysis' || r.report_type === 'presentation_analysis' || r.report_type === 'presentation_rewrite';
+    const score = isDoc
+      ? r.report_json.overall_score || 75
       : r.report_json.overall_score || r.report_json.clarity_score || 70;
 
     return {
       date: dateStr,
       score: score || 0,
-      type: r.report_type === 'document_analysis' ? 'Document' : 'Speech',
+      type: isDoc ? 'Presentation / Document' : 'Speech',
     };
   });
 
@@ -272,7 +277,7 @@ const Analytics: React.FC = () => {
                 </svg>
               </div>
               <div className="stat-content">
-                <h4>Documents Analyzed</h4>
+                <h4>Presentations & Documents</h4>
                 <div className="stat-value">{totalDocs}</div>
                 <p className="stat-subtext">Avg Score: {avgDocScore}/100</p>
               </div>
@@ -485,18 +490,16 @@ const Analytics: React.FC = () => {
                 </thead>
                 <tbody>
                   {historyReports.map((report) => {
-                    const isDoc = report.report_type === 'document_analysis';
+                    const isDoc = report.report_type === 'document_analysis' || report.report_type === 'presentation_analysis' || report.report_type === 'presentation_rewrite';
                     const isLive = report.report_type === 'live_coaching';
                     const score = isDoc 
-                      ? report.report_json.overall_score 
+                      ? report.report_json.overall_score || 75
                       : report.report_json.overall_score || report.report_json.clarity_score || 70;
                       
-                    const displayName = isDoc 
-                      ? report.report_json.document_name || 'Presentation Slides'
-                      : report.report_json.topic || 'Speech Practice Session';
+                    const displayName = report.report_json.presentation_title || report.report_json.document_name || report.report_json.topic || 'Presentation Analysis';
 
                     const typeBadge = isDoc 
-                      ? { label: 'Document', class: 'badge-doc' }
+                      ? { label: report.report_type === 'presentation_analysis' ? 'Presentation' : 'Document', class: 'badge-doc' }
                       : isLive 
                         ? { label: 'Live Coach', class: 'badge-live' }
                         : { label: 'Speech Practice', class: 'badge-speech' };

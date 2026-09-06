@@ -8,6 +8,13 @@ from datetime import datetime, timezone
 logger = logging.getLogger(__name__)
 
 
+def _ensure_list(value, default=None):
+    """Ensure a value is a list; convert None/int to empty list."""
+    if isinstance(value, list):
+        return value
+    return default or []
+
+
 def build_slide_report(original_slides: list[dict], rewritten_slides: list[dict]) -> list[dict]:
     """Pair original and rewritten slides into a per-slide comparison report.
 
@@ -26,51 +33,71 @@ def build_slide_report(original_slides: list[dict], rewritten_slides: list[dict]
         }
 
         # ── Textboxes ────────────────────────────────────────────────────
-        orig_textboxes = {tb['shape_index']: tb for tb in orig.get('textboxes', [])}
-        for tb in rew.get('textboxes', []):
-            orig_tb = orig_textboxes.get(tb['shape_index'], {})
+        orig_textboxes = {}
+        for tb in _ensure_list(orig.get('textboxes')):
+            if isinstance(tb, dict) and 'shape_index' in tb:
+                orig_textboxes[tb['shape_index']] = tb
+        for tb in _ensure_list(rew.get('textboxes')):
+            if not isinstance(tb, dict):
+                continue
+            orig_tb = orig_textboxes.get(tb.get('shape_index'), {})
             slide_report['textboxes'].append({
-                'shape_index': tb['shape_index'],
+                'shape_index': tb.get('shape_index'),
                 'shape_name': orig_tb.get('shape_name', ''),
                 'original_paragraphs': [
-                    _para_text(p) for p in orig_tb.get('paragraphs', [])
+                    _para_text(p) for p in _ensure_list(orig_tb.get('paragraphs'))
                 ],
-                'improved_paragraphs': [str(p) for p in tb.get('paragraphs', [])],
+                'improved_paragraphs': [str(p) for p in _ensure_list(tb.get('paragraphs'))],
             })
 
-        # ── Tables ───────────────────────────────────────────────────────
-        orig_tables = {t['shape_index']: t for t in orig.get('tables_data', [])}
-        for t in rew.get('tables', []):
-            orig_t = orig_tables.get(t['shape_index'], {})
-            orig_cells = {}
-            for c in orig_t.get('cells', []):
-                orig_cells[(c['row_index'], c['column_index'])] = c
+        # ── Tables (support both 'tables_data' and 'tables' keys) ────────
+        orig_table_list = _ensure_list(orig.get('tables_data')) or _ensure_list(orig.get('tables'))
+        orig_tables = {}
+        for t in orig_table_list:
+            if isinstance(t, dict) and 'shape_index' in t:
+                orig_tables[t['shape_index']] = t
+        for t in _ensure_list(rew.get('tables')):
+            if not isinstance(t, dict):
+                continue
+            orig_t = orig_tables.get(t.get('shape_index'), {})
+            orig_cells_map = {}
+            for c in _ensure_list(orig_t.get('cells')):
+                if isinstance(c, dict):
+                    orig_cells_map[(c.get('row_index'), c.get('column_index'))] = c
             cells = []
-            for c in t.get('cells', []):
-                orig_c = orig_cells.get((c['row_index'], c['column_index']), {})
+            for c in _ensure_list(t.get('cells')):
+                if not isinstance(c, dict):
+                    continue
+                orig_c = orig_cells_map.get((c.get('row_index'), c.get('column_index')), {})
                 cells.append({
-                    'row_index': c['row_index'],
-                    'column_index': c['column_index'],
+                    'row_index': c.get('row_index'),
+                    'column_index': c.get('column_index'),
                     'original_paragraphs': [
-                        _para_text(p) for p in orig_c.get('paragraphs', [])
+                        _para_text(p) for p in _ensure_list(orig_c.get('paragraphs'))
                     ],
-                    'improved_paragraphs': [str(p) for p in c.get('paragraphs', [])],
+                    'improved_paragraphs': [str(p) for p in _ensure_list(c.get('paragraphs'))],
                 })
             slide_report['tables'].append({
-                'shape_index': t['shape_index'],
+                'shape_index': t.get('shape_index'),
                 'cells': cells,
             })
 
-        # ── Charts ───────────────────────────────────────────────────────
-        orig_charts = {c['shape_index']: c for c in orig.get('charts_data', [])}
-        for c in rew.get('charts', []):
-            orig_c = orig_charts.get(c['shape_index'], {})
+        # ── Charts (support both 'charts_data' and 'charts' keys) ────────
+        orig_chart_list = _ensure_list(orig.get('charts_data')) or _ensure_list(orig.get('charts'))
+        orig_charts = {}
+        for c in orig_chart_list:
+            if isinstance(c, dict) and 'shape_index' in c:
+                orig_charts[c['shape_index']] = c
+        for c in _ensure_list(rew.get('charts')):
+            if not isinstance(c, dict):
+                continue
+            orig_c = orig_charts.get(c.get('shape_index'), {})
             slide_report['charts'].append({
-                'shape_index': c['shape_index'],
+                'shape_index': c.get('shape_index'),
                 'original_title_paragraphs': [
-                    _para_text(p) for p in orig_c.get('title_paragraphs', [])
+                    _para_text(p) for p in _ensure_list(orig_c.get('title_paragraphs'))
                 ],
-                'improved_title_paragraphs': [str(p) for p in c.get('title_paragraphs', [])],
+                'improved_title_paragraphs': [str(p) for p in _ensure_list(c.get('title_paragraphs'))],
             })
 
         report_slides.append(slide_report)

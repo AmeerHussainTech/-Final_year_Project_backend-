@@ -65,6 +65,20 @@ const Layout: React.FC = () => {
               </NavLink>
             </li>
 
+            {/* NEW FEATURE: GENERATOR */}
+            <li className="nav-item">
+              <NavLink to="/presentation-generator" className="nav-link">
+                Presentation Generator
+              </NavLink>
+            </li>
+
+            {/* DOWNLOAD APP */}
+            <li className="nav-item">
+              <NavLink to="/download" className="nav-link">
+                Download App
+              </NavLink>
+            </li>
+
             <li className="nav-item user-info-item">
               <Link to="/analytics" className="user-name">
                 {user?.name}
@@ -84,7 +98,7 @@ const Layout: React.FC = () => {
 
       {/* Footer */}
       <footer className="footer">
-        <p>&copy; 2026 AI Presentation Analyzer | FYP Project</p>
+        <p>&copy; 2026 AI Presentation Analyzer | FYP Project | <Link to="/download" style={{ color: '#6366f1', textDecoration: 'none' }}>Download Desktop & Mobile Apps</Link></p>
       </footer>
     </div>
   );

@@ -20,6 +20,8 @@ import Analytics from './pages/Analytics';
 import LiveCoach from './pages/LiveCoach';
 import Login from './pages/Login';
 import PresentationRewriter from './pages/PresentationRewriter';
+import PresentationGenerator from './pages/PresentationGenerator';
+import Download from './pages/Download';
 import './App.css';
 
 const App: React.FC = () => {
@@ -54,6 +56,15 @@ const App: React.FC = () => {
               path="/presentation-rewriter"
               element={<PresentationRewriter />}
             />
+
+            {/* Presentation Generator */}
+            <Route
+              path="/presentation-generator"
+              element={<PresentationGenerator />}
+            />
+
+            {/* Download App */}
+            <Route path="/download" element={<Download />} />
 
             {/* Analytics */}
             <Route path="/analytics" element={<Analytics />} />

@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: fyp-presenova
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT main:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: FIREBASE_CREDENTIALS_JSON
+        sync: false   # Paste your Firebase service account JSON here in Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://fyp-integration.web.app,https://fyp-integration.firebaseapp.com"
+      - key: ENABLE_GRAMMAR_CHECK
+        value: "1"
+      - key: LANGUAGETOOL_API_URL
+        value: "https://api.languagetool.org/v2"
+      # Optional: uncomment and set for premium LanguageTool (higher rate limits)
+      # - key: LANGUAGETOOL_API_KEY
+      #   sync: false
+      # - key: LANGUAGETOOL_USERNAME
+      #   sync: false
+    healthCheckPath: /api/health
+

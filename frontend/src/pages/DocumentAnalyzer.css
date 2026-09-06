@@ -1,6 +1,6 @@
 /**
  * DocumentAnalyzer Styles
- * Sleek glassmorphic layout for the 3-step wizard and revision comparison dashboard
+ * Styling for the Document Analyzer component
  */
 
 .document-analyzer {
@@ -34,90 +34,6 @@
   line-height: 1.6;
 }
 
-/* Step Wizard Indicator Bar */
-.step-wizard-indicator {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--card-bg);
-  padding: 1.2rem 2.5rem;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  margin-bottom: 1.5rem;
-}
-
-.step-tab {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--border-radius-sm);
-  transition: var(--transition-smooth);
-}
-
-.step-tab:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-.step-num {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: var(--transition-smooth);
-}
-
-.step-label {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  transition: var(--transition-smooth);
-}
-
-.step-tab.active .step-num {
-  background-color: var(--primary-light);
-  color: #a78bfa;
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-}
-
-.step-tab.active .step-label {
-  color: #a78bfa;
-  text-shadow: 0 0 8px rgba(167, 139, 250, 0.35);
-}
-
-.step-tab.completed .step-num {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-.step-tab.completed .step-label {
-  color: #34d399;
-}
-
-.step-line {
-  flex: 1;
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 0 1.5rem;
-}
-
-/* Step Screen Containers */
 .step-container {
   background: var(--card-bg);
   padding: 3rem;
@@ -190,42 +106,7 @@
   margin-top: 0.5rem;
 }
 
-/* Baseline score banner (Step 2) */
-.baseline-banner {
-  display: flex;
-  justify-content: space-between;
-  background-color: rgba(245, 158, 11, 0.08);
-  border-left: 4px solid var(--warning);
-  padding: 1.2rem 1.8rem;
-  border-radius: var(--border-radius-sm);
-  color: #fbbf24;
-  font-weight: 500;
-  border-top: 1px solid rgba(245, 158, 11, 0.1);
-  border-right: 1px solid rgba(245, 158, 11, 0.1);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.1);
-}
-
-/* Report Viewers */
-.report-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-top: 1.5rem;
-  animation: fadeIn 0.4s ease-in;
-}
-
-.report-success-badge {
-  background-color: rgba(255, 255, 255, 0.02);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  padding: 1rem 2rem;
-  border-radius: var(--border-radius-md);
-  font-weight: 600;
-  text-align: center;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-
+/* Score & Feedback layout */
 .score-summary-row {
   display: flex;
   gap: 2rem;
@@ -268,14 +149,6 @@
   background-clip: text;
 }
 
-.score-circle.v2-color {
-  background: linear-gradient(135deg, #ffffff 40%, #22d3ee 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
-}
-
 .feedback-widget {
   flex: 1;
   background-color: var(--card-bg);
@@ -300,6 +173,7 @@
   font-size: 1.05rem;
 }
 
+/* Report sections */
 .report-sections-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -337,9 +211,6 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--text-muted);
-  border-top: 1px solid rgba(255, 255, 255, 0.02);
-  border-right: 1px solid rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 .rec-list {
@@ -371,111 +242,45 @@
   display: flex;
   justify-content: center;
   margin-top: 1rem;
+  gap: 1rem;
 }
 
-/* Tab Navigation Menu (Step 3) */
+/* Tab Navigation */
 .tab-menu {
   display: flex;
-  gap: 1rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.8rem 1.8rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #718096;
   border-bottom: 3px solid transparent;
-  transition: var(--transition-smooth);
+  transition: all 0.2s ease;
 }
 
-.tab-btn:hover {
-  color: #a78bfa;
+.tab-btn:hover:not(:disabled) {
+  color: #4f46e5;
 }
 
 .tab-btn.active {
-  color: #a78bfa;
-  border-bottom-color: #8b5cf6;
-  text-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
 }
 
-/* STEP 3 DASHBOARD COMPARISON VIEW */
-.comparison-content-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-}
-
-.progress-overview-cards {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
-  background-color: var(--card-bg);
-  padding: 2.5rem;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--shadow-md);
-}
-
-.progress-card-metric {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 1.8rem 1.5rem;
-  border-radius: var(--border-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  width: 160px;
-  text-align: center;
-}
-
-.progress-card-metric h4 {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.metric-num {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1.1;
-}
-
-.metric-num.v2-num {
-  color: #34d399;
-  text-shadow: 0 0 15px rgba(52, 211, 153, 0.25);
-}
-
-.metric-num.diff-num.positive {
-  color: #34d399;
-  text-shadow: 0 0 15px rgba(52, 211, 153, 0.25);
-}
-
-.metric-num.diff-num.negative {
-  color: #f87171;
-  text-shadow: 0 0 15px rgba(248, 113, 113, 0.25);
-}
-
-.arrow-spacer {
-  font-size: 2rem;
-  color: var(--text-muted);
+.tab-btn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.progress-card-metric.difference-card {
-  width: 200px;
-  background-color: rgba(52, 211, 153, 0.06);
-  border: 1px solid rgba(52, 211, 153, 0.2);
-}
-
+/* Visual chart card */
 .visual-chart-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -492,161 +297,7 @@
   margin-bottom: 1.8rem;
 }
 
-.ai-synthesis-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.synthesis-card {
-  padding: 2.5rem;
-  border-radius: var(--border-radius-md);
-  background-color: rgba(56, 189, 248, 0.06);
-  border-left: 4px solid #38bdf8;
-  border-top: 1px solid rgba(56, 189, 248, 0.1);
-  border-right: 1px solid rgba(56, 189, 248, 0.1);
-  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
-}
-
-.synthesis-card h3 {
-  font-size: 1.35rem;
-  color: #38bdf8;
-  margin-bottom: 1rem;
-}
-
-.synthesis-card p {
-  line-height: 1.8;
-  color: var(--text-muted);
-  font-size: 1.05rem;
-}
-
-.synthesis-lists-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.list-box {
-  padding: 2.2rem;
-  border-radius: var(--border-radius-md);
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-}
-
-.list-box h4 {
-  font-size: 1.25rem;
-  margin-bottom: 1.2rem;
-  font-weight: 700;
-}
-
-.improvements-box h4 {
-  color: #34d399;
-}
-
-.remaining-box h4 {
-  color: #fbbf24;
-}
-
-.list-box ul {
-  padding-left: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.list-box li {
-  line-height: 1.7;
-  color: var(--text-muted);
-}
-
-.version-diff-viewer {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.version-diff-viewer h3 {
-  font-size: 1.4rem;
-  color: var(--text-main);
-}
-
-.version-diff-viewer p {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-.diff-container {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  overflow: hidden;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
-  font-size: 0.9rem;
-  background-color: rgba(8, 11, 17, 0.6);
-}
-
-/* General Layout helpers */
-.fadeIn {
-  animation: fadeIn 0.4s ease-in;
-}
-
-.error-message {
-  padding: 1.2rem 1.8rem;
-  background-color: rgba(239, 68, 68, 0.08);
-  border-left: 4px solid var(--danger);
-  color: #f87171;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.95rem;
-  border-top: 1px solid rgba(239, 68, 68, 0.1);
-  border-right: 1px solid rgba(239, 68, 68, 0.1);
-  border-bottom: 1px solid rgba(239, 68, 68, 0.1);
-}
-
-/* Responsive Styles */
-@media (max-width: 900px) {
-  .synthesis-lists-split {
-    grid-template-columns: 1fr;
-  }
-  
-  .score-summary-row {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .score-widget {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .step-wizard-indicator {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.5rem;
-  }
-  
-  .step-line {
-    display: none;
-  }
-  
-  .progress-overview-cards {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
-  }
-  
-  .arrow-spacer {
-    transform: rotate(90deg);
-  }
-  
-  .step-container {
-    padding: 1.5rem;
-  }
-}
-
-/* 7Cs Pie Chart Split Styling */
+/* 7Cs Chart */
 .seven-cs-card-container {
   max-width: 100%;
 }
@@ -681,123 +332,18 @@
   border-top: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
-/* Donut Chart Styling */
-.donut-chart-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 2.2rem;
-  box-shadow: var(--shadow-md);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+/* General Layout helpers */
+.fadeIn {
+  animation: fadeIn 0.4s ease-in;
 }
 
-.donut-chart-card h3 {
-  font-size: 1.3rem;
-  color: var(--text-main);
-  font-weight: 700;
-}
-
-.progress-donut-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.donut-chart-container {
-  position: relative;
-  width: 100%;
-  height: 240px;
-  display: flex;
-  justify-content: center;
-}
-
-.donut-center-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.donut-value {
-  font-size: 2.8rem;
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1;
-}
-
-.donut-sub {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-top: 0.2rem;
-  letter-spacing: 0.05em;
-}
-
-.progress-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 0.5rem;
-  width: 100%;
-  padding-top: 1rem;
-  border-top: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-/* Shared Legend Items */
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.legend-color-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.legend-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* Row splits for Step 3 Comparison Dashboard */
-.comparison-row-split {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 2rem;
-  align-items: start;
-}
-
-.comparison-left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.comparison-left-panel > * {
-  flex-shrink: 0;
-}
-
-.comparison-right-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.comparison-right-panel .visual-chart-card {
-  height: 100%;
+.error-message {
+  padding: 1.2rem 1.8rem;
+  background-color: rgba(239, 68, 68, 0.08);
+  border-left: 4px solid var(--danger);
+  color: #f87171;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.95rem;
 }
 
 /* Report Action Header */
@@ -819,6 +365,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .file-badge {
@@ -831,125 +378,118 @@
   color: var(--text-muted);
 }
 
-.improvement-badge {
-  background: rgba(52, 211, 153, 0.08);
-  border: 1px solid rgba(52, 211, 153, 0.2);
-  color: #34d399;
-  padding: 0.5rem 1.2rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.9rem;
-  font-weight: 700;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.1);
-}
-
-.improvement-badge.negative {
-  background: rgba(248, 113, 113, 0.08);
-  border: 1px solid rgba(248, 113, 113, 0.2);
-  color: #f87171;
-  padding: 0.5rem 1.2rem;
-  border-radius: var(--border-radius-sm);
-  font-size: 0.9rem;
-  font-weight: 700;
-  box-shadow: 0 0 10px rgba(248, 113, 113, 0.1);
+.score-badge {
+  background: #4f46e5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .report-actions-buttons {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .report-actions-buttons button {
   min-width: 200px;
 }
 
-/* Print styles */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
+/* History Tab Styling */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
 
-  .navbar,
-  .footer,
-  .step-wizard-indicator,
-  .tab-menu,
-  .report-actions-buttons,
-  .reset-container,
-  .upload-box-wrapper,
-  .baseline-banner,
-  .proceed-action-row,
-  .version-diff-viewer {
-    display: none !important;
-  }
+.history-item {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+}
 
-  .main-content {
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
+.history-item:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
 
-  .step-container {
-    box-shadow: none !important;
-    padding: 0 !important;
-    background: none !important;
-  }
+/* Tips Section Styling */
+.tips-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-left: 4px solid #4f46e5;
+  border-radius: 8px;
+}
 
-  .document-analyzer h1 {
-    font-size: 1.8rem !important;
-    margin-bottom: 0.5rem !important;
-  }
+.tips-section h4 {
+  color: #1f2937;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
 
-  .comparison-row-split,
-  .seven-cs-content-split {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 1.5rem !important;
-  }
+.tips-section ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
 
-  .report-sections-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 1.5rem !important;
-  }
+.tips-section li {
+  margin-bottom: 0.8rem;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
 
-  .report-card,
-  .visual-chart-card,
-  .donut-chart-card,
-  .ai-synthesis-grid {
-    page-break-inside: avoid !important;
-    border: 1px solid #cbd5e1 !important;
-    background: #ffffff !important;
-    box-shadow: none !important;
-    padding: 1.5rem !important;
-    border-radius: 8px !important;
-  }
+.tips-section li:before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+}
 
-  .c-item {
-    border-left: 3px solid #4f46e5 !important;
-    background: #f8fafc !important;
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Responsive adjustment for chart layouts */
-@media (max-width: 1024px) {
-  .comparison-row-split {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Responsive Styles */
 @media (max-width: 900px) {
+  .score-summary-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .score-widget {
+    width: 100%;
+  }
   .seven-cs-content-split {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
+  .step-container {
+    padding: 1.5rem;
+  }
   .report-actions-header {
     flex-direction: column;
     align-items: stretch;
@@ -990,3 +530,41 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+/* Print styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .navbar, .footer, .tab-menu, .report-actions-buttons, .upload-box-wrapper {
+    display: none !important;
+  }
+  .step-container {
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Legend shared styles */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.legend-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

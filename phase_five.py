@@ -1,40 +1,33 @@
 """
 Phase Five: AI Coach / Practice Mode Blueprint
-Role: Provide real-time AI coaching using Google Gemini 1.5 Flash for presentation practice and feedback.
+Role: Provide real-time local AI coaching for presentation practice and feedback.
 
 Key Features:
-- Multi-turn conversational AI using Gemini 1.5 Flash model
+- Multi-turn conversational intent classification using TF-IDF + Logistic Regression
+- Dr. Alexander Vance finite-state machine persona
 - Context-aware coaching based on document analysis reports
-- System prompt injection for consistent AI persona
-- Maintains chat history for contextual continuity
-- Comprehensive error handling for API failures
-- Session-based chat memory management
+- Grammar analysis via LanguageTool
 """
 
 import os
-import warnings
-warnings.filterwarnings('ignore', category=FutureWarning, module='google.generativeai')
+import logging
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-import google.generativeai as genai
 from dotenv import load_dotenv
+from services.language_tool_service import (
+    check_grammar,
+    summarise_grammar_issues,
+    grammar_score as lt_grammar_score,
+)
+from services.coach_intent_engine import process_coach_chat, predict_intent
+from services.coach_state_machine import transition_state
+from services.coach_templates import COACH_RESPONSES
 
-# Load environment variables from .env file
+logger = logging.getLogger(__name__)
+
+# Load environment variables
 load_dotenv()
 
-# Initialize Gemini API
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-gemini_available = False
-
-if GEMINI_API_KEY and GEMINI_API_KEY != 'your-gemini-api-key-here':
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        gemini_available = True
-        print("✅ Gemini API configured successfully for AI Coach")
-    except Exception as e:
-        print(f"⚠️ Failed to configure Gemini API: {str(e)}")
-else:
-    print("⚠️ GEMINI_API_KEY not configured or placeholder used. Running in demo mode with mock fallbacks.")
 
 
 # Create a blueprint for AI coach / practice mode
@@ -133,6 +126,30 @@ def practice_chat():
         history = data.get('history', [])
         context_report = data.get('contextReport', {})
 
+        # ===== STEP 1b: GRAMMAR CHECK ON USER MESSAGE =====
+        # Run LanguageTool on the user's spoken/typed message so the AI coach
+        # can point out specific grammar mistakes in the user's own words.
+        grammar_issues = []
+        grammar_score_val = 100
+        grammar_context = ""
+        try:
+            if len(message) > 10:
+                grammar_issues = check_grammar(message)
+                grammar_score_val = lt_grammar_score(grammar_issues, len(message.split()))
+                grammar_summary = summarise_grammar_issues(grammar_issues, max_issues=10)
+                if grammar_issues:
+                    grammar_context = f"""
+
+--- GRAMMAR ANALYSIS OF USER'S MESSAGE (LanguageTool) ---
+Grammar Score: {grammar_score_val}/100  |  Issues Found: {len(grammar_issues)}
+{grammar_summary}
+IMPORTANT: Gently point out these grammar issues in your coaching response.
+Be specific — quote the erroneous phrase and suggest the correction.
+--- END GRAMMAR ANALYSIS ---"""
+                    print(f"[AI COACH] LanguageTool: {len(grammar_issues)} grammar issues in user message.")
+        except Exception as _ge:
+            print(f"[AI COACH WARN] Grammar pre-pass failed: {_ge}")
+
         # ===== STEP 2: BUILD SYSTEM PROMPT WITH CONTEXT INJECTION =====
         # CRITICAL: The system prompt establishes the AI's role and constraints
         # Context injection allows the AI to reference the user's detailed V1 vs V2 analysis
@@ -157,76 +174,32 @@ Previous Analysis Session Context:
 - Progress Comparison Report: {comparison_data}
 """
 
-        system_prompt = f"""You are an expert presentation coach and public speaking mentor. Your role is to help users practice and improve their presentation skills through encouragement, practical tips, and constructive feedback.
+        system_prompt = f"""You are Dr. Alexander Vance, a World-Class Executive Presentation Coach and Viva Defense Specialist.
 
-CONTEXT ABOUT THE USER'S PRESENTATION (V1 vs V2 COMPARISON):
-{context_text}
+CRITICAL MANDATE - CONCISE & QUESTION-APPROPRIATE RESPONSES:
+- **Maximum Length**: Keep your response short, punchy, and digestible (2 to 3 brief bullet points or paragraphs, UNDER 150 words total).
+- **Direct & Actionable**: Answer the user's specific question immediately. Do not write long preambles, multi-page outlines, or unrequested general lectures.
+- **Practice-Friendly**: Format feedback so a student can read and apply it in 5–10 seconds while practicing.
+- **Scripting**: If giving script rewrites, provide only 1 to 2 crisp, high-impact sentences.
+- **Grammar**: If grammar issues are flagged below, briefly point out the fix in 1 sentence.
 
-COACHING GUIDELINES:
-1. Provide clear, supportive, and engaging responses. While standard conversation should be concise, when explaining how to fix issues or providing suggestions to make the presentation 100% perfect, provide structured, comprehensive guidance (e.g., bullet points, clear recommendations, and step-by-step suggestions).
-2. Ask follow-up questions to test understanding and deepen learning.
-3. Provide actionable, specific advice (not generic tips). Show the user exactly how to write or deliver specific sections of their content.
-4. Reference their specific analysis reports, V1 baseline text vs V2 improved text, and the remaining issues to polish.
-5. Maintain a supportive, positive, and professional tone.
-6. Address key improvement areas and guide them on how to resolve the remaining gaps.
-7. Celebrate progress and improvements between V1 and V2.
+=== USER PRESENTATION CONTEXT ===
+{context_text}{grammar_context}
 
-IMPORTANT: Always stay in character as a presentation coach. Guide the user on how they can make their presentation 100% perfect by fixing slide content, pacing, structure, delivery, or visual/vocal gaps."""
+=== STYLE ===
+- Professional, encouraging, clear, and focused.
+- End with 1 short, targeted follow-up question or quick tip."""
 
-        # ===== STEP 3: INITIALIZE GEMINI MODEL =====
-        ai_response_text = ""
+        # ===== STEP 3: LOCAL INTENT ENGINE & STATE MACHINE =====
+        from services.coach_intent_engine import process_coach_chat
         
-        if gemini_available:
-            try:
-                model = genai.GenerativeModel('gemini-flash-latest')
-
-                # ===== STEP 4: FORMAT CHAT HISTORY FOR GEMINI =====
-                # Convert frontend history format to Gemini's expected format
-                gemini_history = format_chat_history(history)
-
-                print(f"📊 Chat history converted: {len(gemini_history)} previous messages")
-
-                # ===== STEP 5: START CHAT SESSION AND SEND MESSAGE =====
-                # CRITICAL: Use model.start_chat() with the formatted history
-                # This maintains conversation continuity across multiple turns
-                # The system prompt is used as the first user message to establish context
-                
-                temp_chat_session = model.start_chat(history=gemini_history)
-
-                print(f"🤖 Sending message to Gemini 1.5 Flash...")
-
-                # Send the current message along with the system prompt as context
-                response = temp_chat_session.send_message(
-                    f"{system_prompt}\n\nUser message: {message}",
-                    generation_config={
-                        "temperature": 0.7,  # Balanced creativity and consistency
-                        "top_p": 0.9,
-                        "top_k": 40,
-                        "max_output_tokens": 500  # Limit response length for chat
-                    }
-                )
-
-                # ===== STEP 6: EXTRACT AND VALIDATE RESPONSE =====
-                ai_response_text = response.text.strip()
-            except Exception as e:
-                print(f"⚠️ Gemini chat failed at runtime: {str(e)}")
-                ai_response_text = ""
-
-        if not ai_response_text:
-            print("⚠️ Using mock fallback for AI Coach response due to API error or configuration.")
-            msg_lower = message.lower()
-            
-            # Simple keyword-based coaching advice matching presentation coach persona
-            if "filler" in msg_lower or "like" in msg_lower or "um" in msg_lower:
-                ai_response_text = "To minimize filler words like 'um' or 'like', practice inserting silent pauses. A pause gives you time to think and sounds more authoritative to your audience. Try rehearsing a 1-minute introduction and consciously pausing instead of speaking filler words."
-            elif "nervous" in msg_lower or "anxiety" in msg_lower or "scared" in msg_lower:
-                ai_response_text = "It's completely normal to feel nervous! I recommend taking 3 deep belly breaths before you step up to speak, and focusing on your message rather than the audience's reaction. Have you tried practicing in front of a mirror or a friend first?"
-            elif "slide" in msg_lower or "powerpoint" in msg_lower or "visual" in msg_lower:
-                ai_response_text = "For slides, follow the 6x6 rule: limit slides to 6 bullet points, and 6 words per bullet. Use high-quality visuals to support your words rather than reading off the slide. What is the main theme of your current slide deck?"
-            elif "pace" in msg_lower or "speed" in msg_lower or "fast" in msg_lower or "slow" in msg_lower:
-                ai_response_text = "An ideal speaking rate is between 120 and 160 words per minute. If you speak too fast, try pausing at the end of each major sentence to let the point land. Let's practice: can you try saying your opening statement slowly and deliberately?"
-            else:
-                ai_response_text = "That's a very good question! As your presentation coach, I highly recommend structuring your speech with a clear Hook, a Body with three key points, and a memorable Conclusion. Which section of your presentation are you currently practicing?"
+        coach_result = process_coach_chat(
+            user_message=message,
+            current_state="PRACTICE",
+            session_context=context_report
+        )
+        
+        ai_response_text = coach_result.get("response", "Keep practicing with clear WPM pacing and structured slides.")
 
         if not ai_response_text:
             print("❌ Empty response from Gemini API")
@@ -240,7 +213,11 @@ IMPORTANT: Always stay in character as a presentation coach. Guide the user on h
             "status": "success",
             "ai_response": ai_response_text,
             "message_id": f"msg_{int(datetime.now().timestamp() * 1000)}",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            # Grammar data for the user's own message
+            "grammar_score": grammar_score_val,
+            "grammar_issues": grammar_issues,
+            "grammar_issues_count": len(grammar_issues),
         }
 
         print(f"✅ AI Coach response generated successfully")

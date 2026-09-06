@@ -2,7 +2,7 @@
 Per-Slide Quality Analyzer
 
 Analyzes each slide individually for:
-- Grammar and spelling quality
+- Grammar and spelling quality (via LanguageTool Cloud API)
 - Readability and tone
 - Clarity and conciseness
 - 7 Cs of Communication scores
@@ -16,6 +16,10 @@ from typing import Optional
 from services.ai import get_provider
 from services.ai.base_provider import AIProvider
 from services.ai.prompts import build_quality_analysis_prompt
+from services.language_tool_service import (
+    check_grammar,
+    grammar_score as lt_grammar_score,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +38,9 @@ class PerSlideAnalyzer:
     ) -> dict:
         """Analyze the full presentation text for quality.
 
+        Runs a LanguageTool Cloud grammar pre-pass first so that Grammar,
+        Spelling, and the 'Correct' 7Cs dimension are scored with real data.
+
         Args:
             text: Full presentation text.
             filename: Original filename for context.
@@ -45,20 +52,54 @@ class PerSlideAnalyzer:
         if not text or len(text.strip()) < 10:
             return self._default_scores()
 
+        # ── Grammar pre-pass (LanguageTool Cloud) ─────────────────────────
+        grammar_issues: list[dict] = []
+        computed_grammar_score: int = 100
+        try:
+            grammar_issues = check_grammar(text)
+            computed_grammar_score = lt_grammar_score(grammar_issues, len(text.split()))
+            logger.info(
+                "[per_slide] LanguageTool: %d issues, grammar score=%d",
+                len(grammar_issues), computed_grammar_score,
+            )
+        except Exception as exc:
+            logger.warning("[per_slide] Grammar pre-pass failed: %s", exc)
+
         if self.provider and self.provider.is_available():
             try:
-                prompt = build_quality_analysis_prompt(text, filename, mode)
+                prompt = build_quality_analysis_prompt(
+                    text, filename, mode,
+                    grammar_issues=grammar_issues,
+                    grammar_score=computed_grammar_score,
+                )
                 result = self.provider.generate_structured(
                     prompt=prompt,
                     temperature=0.2,
                     max_output_tokens=4096,
                 )
                 if isinstance(result, dict) and 'overall_score' in result:
-                    return self._normalize(result)
+                    normalized = self._normalize(result)
+                    # Override grammar-related scores with LanguageTool's
+                    # authoritative values so they cannot be hallucinated.
+                    normalized.setdefault('category_scores', {})['Grammar'] = computed_grammar_score
+                    normalized['category_scores']['Spelling'] = computed_grammar_score
+                    normalized.setdefault('seven_cs_scores', {})['Correct'] = computed_grammar_score
+                    normalized['grammar_issues'] = grammar_issues
+                    normalized['grammar_issues_count'] = len(grammar_issues)
+                    normalized['grammar_score'] = computed_grammar_score
+                    return normalized
             except Exception as exc:
                 logger.warning("[per_slide] AI analysis failed: %s", exc)
 
-        return self._default_scores()
+        # Fallback with grammar data injected
+        fallback = self._default_scores()
+        fallback['category_scores']['Grammar'] = computed_grammar_score
+        fallback['category_scores']['Spelling'] = computed_grammar_score
+        fallback['seven_cs_scores']['Correct'] = computed_grammar_score
+        fallback['grammar_issues'] = grammar_issues
+        fallback['grammar_issues_count'] = len(grammar_issues)
+        fallback['grammar_score'] = computed_grammar_score
+        return fallback
 
     def analyze_slide(self, slide: dict) -> dict:
         """Analyze a single slide's text content.
@@ -125,17 +166,24 @@ class PerSlideAnalyzer:
         return max(0, min(100, round(score, 1)))
 
     def _has_grammar_issues(self, text: str) -> bool:
-        """Simple heuristic check for potential grammar issues."""
+        """Check for grammar issues using LanguageTool Cloud API.
+
+        Falls back to simple heuristics if the API is unavailable.
+        """
+        try:
+            issues = check_grammar(text)
+            return len(issues) > 0
+        except Exception:
+            pass
+
+        # Heuristic fallback
         issues = 0
-        # Check for double spaces
         if '  ' in text:
             issues += 1
-        # Check for missing capitalization at sentence starts
         for sentence in text.split('.'):
             s = sentence.strip()
             if s and s[0].islower():
                 issues += 1
-        # Check for very long sentences (>40 words)
         for sentence in text.split('.'):
             if len(sentence.split()) > 40:
                 issues += 1

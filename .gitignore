@@ -56,3 +56,21 @@ logs/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Firebase Credentials (NEVER commit this!)
+firebase-service-account.json
+*.service-account.json
+
+# Firebase local
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Electron build output
+frontend/dist-electron/
+frontend/release/
+
+# Temporary and generated files
+instance/
+.venv/
+

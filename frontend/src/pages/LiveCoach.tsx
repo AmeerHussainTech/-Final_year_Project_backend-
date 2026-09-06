@@ -1,24 +1,36 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLiveSession } from '../hooks/useLiveSession';
 import VideoCapture from '../components/VideoCapture';
 import LiveFeedbackOverlay from '../components/LiveFeedbackOverlay';
 import ReportDashboard from '../components/ReportDashboard';
-import { compareDocuments } from '../services/api';
+// compareDocuments is no longer used - V1/V2 wizard removed
+// import { compareDocuments } from '../services/api'; // Removed - no longer used
 import { downloadProgressReportPDF } from '../services/pdfGenerator';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './LiveCoach.css';
 
+/**
+ * LiveCoach Page
+ * Real-time presentation practice with webcam/mic tracking (eye contact, posture, pacing, filler words)
+ * and academic-panel Q&A interruptions, scored via Gemini 7Cs evaluation.
+ *
+ * NOTE: V1 vs V2 comparison flow is temporarily commented out (single-session flow, matching
+ * SpeechAnalyzer.tsx and DocumentAnalyzer.tsx). Search "COMPARISON_DISABLED" to re-enable all sections at once.
+ * Nothing below is deleted — everything is preserved as comments for easy restoration.
+ */
+
 const LiveCoach: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?.id || 'guest';
 
-  // ===== WIZARD STATE MANAGEMENT =====
-  const [step, setStep] = useState(1);
-  const [activeReportTab, setActiveReportTab] = useState<'comparison' | 'v1' | 'v2'>('comparison');
+  // ===== WIZARD STATE (kept for potential re-enable, unused while comparison is disabled) =====
+  const [_step, _setStep] = useState(1);
 
+  /* COMPARISON_DISABLED — uncomment to re-enable tab switching in step 3
+  const [activeReportTab, setActiveReportTab] = useState<'comparison' | 'v1' | 'v2'>('comparison');
+  */
+
+  /* COMPARISON_DISABLED — uncomment to re-enable practice-with-coach navigation (needs v2Report)
   const handlePracticeWithCoach = () => {
     if (!v2Report) return;
     navigate('/practice', {
@@ -34,24 +46,26 @@ const LiveCoach: React.FC = () => {
       }
     });
   };
-  
-  // Version 1 Session States
-  const [v1SessionId, setV1SessionId] = useState<string | null>(null);
+  */
+
+  // Version 1 (single-session) states
+  const [_v1SessionId, setV1SessionId] = useState<string | null>(null);
   const [v1Report, setV1Report] = useState<any | null>(null);
   const [v1Topic, setV1Topic] = useState('');
 
-  // Version 2 Session States
+  /* COMPARISON_DISABLED — uncomment to re-enable Version 2 states
   const [v2SessionId, setV2SessionId] = useState<string | null>(null);
   const [v2Report, setV2Report] = useState<any | null>(null);
+  */
 
-  // Comparison Report State
+  /* COMPARISON_DISABLED — uncomment to re-enable comparison state
   const [comparison, setComparison] = useState<any | null>(null);
+  */
 
   // Live session interactive state
   const [topic, setTopic] = useState('');
   const [seconds, setSeconds] = useState(0);
   const [answerText, setAnswerText] = useState('');
-
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const timerRef = useRef<any>(null);
@@ -90,19 +104,23 @@ const LiveCoach: React.FC = () => {
     };
   }, [status]);
 
-  // Save baseline and revision reports
+  // Save session report (always V1 — comparison disabled)
   useEffect(() => {
     if (status === 'FINISHED' && finalReport && sessionId) {
-      if (step === 1 && sessionId !== v2SessionId && !v1Report) {
+      if (!v1Report) {
         setV1Report(finalReport);
         setV1SessionId(sessionId);
         setV1Topic(topic);
+      }
+
+      /* COMPARISON_DISABLED — uncomment else-if to re-enable step-based V2 saving
       } else if (step === 2 && sessionId !== v1SessionId && !v2Report) {
         setV2Report(finalReport);
         setV2SessionId(sessionId);
       }
+      */
     }
-  }, [status, finalReport, sessionId, step, topic, v1SessionId, v2SessionId, v1Report, v2Report]);
+  }, [status, finalReport, sessionId, topic, v1Report]);
 
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,24 +140,28 @@ const LiveCoach: React.FC = () => {
     setAnswerText('');
   };
 
-  // Generate Comparison Report
+  /* COMPARISON_DISABLED — uncomment to re-enable comparison generation
   const handleCompare = async () => {
     if (!v1Report || !v2Report) {
       return;
     }
-    const v1Text = v1Report.improved_text || `Live Presentation session baseline on topic: ${v1Report.topic}`;
-    const v2Text = v2Report.improved_text || `Live Presentation session revision on topic: ${v2Report.topic}`;
-    
     setSeconds(0);
-    
     try {
-      const result = await compareDocuments(
-        v1Text,
-        v2Text,
-        v1Report.overall_score,
-        v2Report.overall_score,
-        'live_coaching_practice.webm'
-      );
+      const v1Score = v1Report.overall_score || 0;
+      const v2Score = v2Report.overall_score || 0;
+      const result = {
+        score_difference: v2Score - v1Score,
+        key_improvements: [
+          `Eye contact improved from ${v1Report.session_metrics?.avg_eye_contact || 0}% to ${v2Report.session_metrics?.avg_eye_contact || 0}%`,
+          `Body posture improved from ${v1Report.session_metrics?.avg_posture || 0}% to ${v2Report.session_metrics?.avg_posture || 0}%`,
+          `Overall score increased by ${v2Score - v1Score} points`,
+        ],
+        remaining_issues: [
+          'Continue practicing to reduce filler words further',
+          'Work on maintaining consistent eye contact',
+        ],
+        synthesis_summary: `Your live practice improved from a score of ${v1Score}/100 to ${v2Score}/100. Eye contact and body posture showed measurable improvement.`,
+      };
       setComparison(result);
       setStep(3);
       setActiveReportTab('comparison');
@@ -147,7 +169,45 @@ const LiveCoach: React.FC = () => {
       console.error('Failed to generate live progress report:', err);
     }
   };
+  */
 
+  // ===== DOWNLOAD REPORT (single-session — comparison disabled) =====
+  const handleDownloadReport = () => {
+    if (!v1Report) return;
+
+    const categoryScores = [
+      { name: 'Structure', v1: v1Report.category_scores?.Structure || 0, v2: v1Report.category_scores?.Structure || 0 },
+      { name: 'Clarity', v1: v1Report.category_scores?.Clarity || 0, v2: v1Report.category_scores?.Clarity || 0 },
+      { name: 'Persuasion', v1: v1Report.category_scores?.Persuasion || 0, v2: v1Report.category_scores?.Persuasion || 0 },
+      { name: 'Content Quality', v1: v1Report.category_scores?.Content_Quality || 0, v2: v1Report.category_scores?.Content_Quality || 0 },
+      { name: 'Call to Action', v1: v1Report.category_scores?.Call_to_Action || 0, v2: v1Report.category_scores?.Call_to_Action || 0 },
+    ];
+
+    const additionalMetrics = [
+      { label: 'Average Eye Contact', v1: `${v1Report.session_metrics?.avg_eye_contact ?? 0}%`, v2: `${v1Report.session_metrics?.avg_eye_contact ?? 0}%`, change: '' },
+      { label: 'Body Posture Accuracy', v1: `${v1Report.session_metrics?.avg_posture ?? 0}%`, v2: `${v1Report.session_metrics?.avg_posture ?? 0}%`, change: '' },
+      { label: 'Average Confidence', v1: `${v1Report.session_metrics?.avg_confidence ?? 0}%`, v2: `${v1Report.session_metrics?.avg_confidence ?? 0}%`, change: '' },
+      { label: 'Vocal Pitch Dynamics', v1: `${v1Report.session_metrics?.avg_vocal_pitch ?? 0}%`, v2: `${v1Report.session_metrics?.avg_vocal_pitch ?? 0}%`, change: '' },
+      { label: 'Speaking Pace', v1: `${v1Report.session_metrics?.avg_wpm ?? 0} WPM`, v2: `${v1Report.session_metrics?.avg_wpm ?? 0} WPM`, change: '' },
+      { label: 'Filler Words Count', v1: `${v1Report.session_metrics?.total_fillers ?? 0}`, v2: `${v1Report.session_metrics?.total_fillers ?? 0}`, change: '' },
+      { label: 'Questions Handled', v1: `${v1Report.session_metrics?.interruptions_handled ?? 0}`, v2: `${v1Report.session_metrics?.interruptions_handled ?? 0}`, change: '' },
+    ];
+
+    downloadProgressReportPDF({
+      title: 'Live Presentation Report',
+      documentName: v1Topic || v1Report.topic || 'Live Practice Session',
+      v1Score: v1Report.overall_score,
+      v2Score: v1Report.overall_score,
+      gain: 0,
+      categoryScores,
+      synthesis: v1Report.detailed_feedback || 'Your live presentation session has been analyzed.',
+      improvements: v1Report.recommendations || [],
+      remaining: [],
+      additionalMetrics,
+    }, 'Live_Coaching_Report.pdf');
+  };
+
+  /* COMPARISON_DISABLED — original two-version download report (uncomment to re-enable)
   const handleDownloadReport = () => {
     if (!v1Report || !v2Report) return;
     
@@ -217,18 +277,22 @@ const LiveCoach: React.FC = () => {
       additionalMetrics,
     }, 'Live_Coaching_Progress_Report.pdf');
   };
+  */
 
   const handleReset = () => {
     setTopic('');
     setSeconds(0);
     setAnswerText('');
-    setStep(1);
     setV1SessionId(null);
     setV1Report(null);
     setV1Topic('');
+
+    /* COMPARISON_DISABLED — uncomment to re-enable full reset
+    setStep(1);
     setV2SessionId(null);
     setV2Report(null);
     setComparison(null);
+    */
   };
 
   const formatTime = (secs: number) => {
@@ -241,7 +305,7 @@ const LiveCoach: React.FC = () => {
 
   return (
     <div className="live-coach-page container">
-      {/* Step Navigation Wizard (Only shown when session is NOT active) */}
+      {/* COMPARISON_DISABLED — uncomment to re-enable 3-step wizard
       {!isSessionActive && (
         <div className="step-wizard-indicator">
           <button 
@@ -277,6 +341,7 @@ const LiveCoach: React.FC = () => {
           </button>
         </div>
       )}
+      */}
 
       {/* ACTIVE PRESENTATION HUD */}
       {isSessionActive && (
@@ -393,43 +458,49 @@ const LiveCoach: React.FC = () => {
       {/* STATIC SCREENS (When session is NOT active) */}
       {!isSessionActive && (
         <>
-          {/* STEP 1 SCREENS */}
-          {step === 1 && (
+          {v1Report ? (
             <>
-              {v1Report ? (
-                <ReportDashboard 
-                  report={v1Report} 
-                  onReset={() => setStep(2)} 
-                  resetButtonLabel="Proceed to Step 2 (Revision Practice)"
-                />
-              ) : (
-                <div className="topic-selector-card fadeIn">
-                  <span className="coach-badge">STEP 1: BASELINE SESSION</span>
-                  <h1>Interactive Presentation Practice</h1>
-                  <p className="subtitle">
-                    Enter a presentation topic. The coach will track your visual presence, eye contact, posture, and pacing. 
-                    An academic panel will occasionally interrupt you with real-time questions to test your depth.
-                  </p>
-
-                  <form onSubmit={handleStart} className="topic-form">
-                    <input
-                      type="text"
-                      placeholder="e.g., Blockchain Scaling, Machine Learning in Health..."
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                      required
-                      className="topic-input"
-                    />
-                    <button type="submit" className="start-btn-premium">
-                      Start Practice Session
-                    </button>
-                  </form>
-                </div>
-              )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem 0' }}>
+                <button
+                  onClick={handleDownloadReport}
+                  className="start-btn-premium"
+                  style={{ margin: 0, padding: '0.6rem 2rem', fontSize: '0.95rem' }}
+                >
+                  Download Report
+                </button>
+              </div>
+              <ReportDashboard 
+                report={v1Report} 
+                onReset={handleReset} 
+                resetButtonLabel="Practice New Topic"
+              />
             </>
+          ) : (
+            <div className="topic-selector-card fadeIn">
+              <span className="coach-badge">LIVE PRACTICE SESSION</span>
+              <h1>Interactive Presentation Practice</h1>
+              <p className="subtitle">
+                Enter a presentation topic. The coach will track your visual presence, eye contact, posture, and pacing. 
+                An academic panel will occasionally interrupt you with real-time questions to test your depth.
+              </p>
+
+              <form onSubmit={handleStart} className="topic-form">
+                <input
+                  type="text"
+                  placeholder="e.g., Blockchain Scaling, Machine Learning in Health..."
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  required
+                  className="topic-input"
+                />
+                <button type="submit" className="start-btn-premium">
+                  Start Practice Session
+                </button>
+              </form>
+            </div>
           )}
 
-          {/* STEP 2 SCREENS */}
+          {/* COMPARISON_DISABLED — entire Step 2 block (Revised Practice). Uncomment to re-enable.
           {step === 2 && (
             <>
               {v2Report ? (
@@ -482,8 +553,9 @@ const LiveCoach: React.FC = () => {
               )}
             </>
           )}
+          */}
 
-          {/* STEP 3 SCREEN (COMPARISON VIEW) */}
+          {/* COMPARISON_DISABLED — entire Step 3 block (Comparison view). Uncomment to re-enable.
           {step === 3 && v1Report && v2Report && (
             <div className="comparison-dashboard fadeIn" style={{ background: 'var(--card-bg)', padding: '2.5rem', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <h2>Step 3: Live Practice Revision Comparison</h2>
@@ -533,7 +605,6 @@ const LiveCoach: React.FC = () => {
 
               {activeReportTab === 'comparison' && (
                 <div className="comparison-content-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                  {/* Score deltas */}
                   <div className="progress-overview-cards" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', backgroundColor: '#f9fafb', padding: '2rem', borderRadius: '12px', border: '1px solid #edf2f7' }}>
                     <div className="progress-card-metric" style={{ background: 'white', padding: '1.5rem', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', width: '150px', textAlign: 'center' }}>
                       <h4 style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Baseline Score</h4>
@@ -557,7 +628,6 @@ const LiveCoach: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Progress Summary Cards */}
                   <div className="comparison-row-split" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', alignItems: 'start' }}>
                     <div className="comparison-left-panel" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                       {comparison && (
@@ -567,7 +637,6 @@ const LiveCoach: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Improvements lists */}
                       {comparison && (
                         <div className="synthesis-lists-split" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                           <div className="list-box improvements-box" style={{ padding: '2rem', borderRadius: '12px', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
@@ -592,7 +661,6 @@ const LiveCoach: React.FC = () => {
                     </div>
 
                     <div className="comparison-right-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-                      {/* Performance Dimension Comparison Chart */}
                       <div className="visual-chart-card" style={{ background: 'white', border: '1px solid #edf2f7', borderRadius: '12px', padding: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', height: '100%' }}>
                         <h3 style={{ fontSize: '1.25rem', color: '#1f2937', fontWeight: 700, marginBottom: '1.5rem' }}>Performance Dimension Comparison</h3>
                         <ResponsiveContainer width="100%" height={280}>
@@ -616,7 +684,6 @@ const LiveCoach: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Visual & Vocal Metrics Comparison Table */}
                   <div className="metrics-comparison-card" style={{ background: 'white', border: '1px solid #edf2f7', borderRadius: '12px', padding: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                     <h3 style={{ fontSize: '1.2rem', color: '#1f2937', fontWeight: 700, marginBottom: '1.5rem' }}>Visual & Vocal Metrics Comparison</h3>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -694,7 +761,6 @@ const LiveCoach: React.FC = () => {
                     </table>
                   </div>
 
-                  {/* Reset Actions */}
                   <div className="proceed-action-row mt-4" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
                     <button className="start-btn-premium" onClick={handlePracticeWithCoach} style={{ margin: 0 }}>
                       Practice with AI Coach
@@ -714,6 +780,7 @@ const LiveCoach: React.FC = () => {
               )}
             </div>
           )}
+          */}
         </>
       )}
 

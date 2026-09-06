@@ -15,7 +15,7 @@ interface FileUploaderProps {
 
 const FileUploader: React.FC<FileUploaderProps> = ({
   onFileSelect,
-  accept = '.pdf,.doc,.docx,.txt',
+  accept = '.pdf,.pptx,.doc,.docx,.txt',
   disabled = false,
   loading = false,
 }) => {

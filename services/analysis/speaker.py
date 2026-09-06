@@ -15,23 +15,14 @@ import math
 import re
 from typing import Optional
 
+from services.config import (
+    SPEAKING_WORDS_PER_MINUTE,
+    SLOW_SPEAKING_WPM,
+    FAST_SPEAKING_WPM,
+    FLESCH_SCORES,
+)
+
 logger = logging.getLogger(__name__)
-
-# Speaking speed metrics
-SLOW_SPEAKING_WPM = 130
-NORMAL_SPEAKING_WPM = 150
-FAST_SPEAKING_WPM = 170
-
-# Flesch Reading Ease thresholds
-FLESCH_SCORES = {
-    'very_easy': (90, 100),
-    'easy': (80, 89),
-    'fairly_easy': (70, 79),
-    'standard': (60, 69),
-    'fairly_difficult': (50, 59),
-    'difficult': (30, 49),
-    'very_confusing': (0, 29),
-}
 
 
 class SpeakerAnalyzer:
@@ -77,7 +68,7 @@ class SpeakerAnalyzer:
         word_count = len(full_text.split())
 
         # ── Speaking Duration ──────────────────────────────────────────
-        normal_duration_min = word_count / NORMAL_SPEAKING_WPM
+        normal_duration_min = word_count / SPEAKING_WORDS_PER_MINUTE
         slow_duration_min = word_count / SLOW_SPEAKING_WPM
         fast_duration_min = word_count / FAST_SPEAKING_WPM
 

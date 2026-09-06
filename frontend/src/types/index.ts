@@ -63,6 +63,14 @@ export interface SevenCsScores {
   Consistent: number;
 }
 
+export interface ContextAnalysis {
+  context_accuracy_score?: number;
+  is_context_accurate?: boolean;
+  factual_correctness_summary?: string;
+  inaccuracies_detected?: string[];
+  context_based_changes?: string[];
+}
+
 export interface AnalysisReport {
   status: string;
   overall_score: number;
@@ -71,9 +79,12 @@ export interface AnalysisReport {
   category_scores: CategoryScores;
   seven_cs_evaluation: SevenCsEvaluation;
   seven_cs_scores?: SevenCsScores;
+  context_analysis?: ContextAnalysis;
   recommendations: string[];
   original_text?: string;
   improved_text?: string;
+  strengths?: string[];
+  analysis_timestamp: string;
 }
 
 // Phase 4: Speech Analysis Response
@@ -137,10 +148,10 @@ export interface ApiError {
   status: number;
 }
 
-// Phase 2: Document Version Comparison
-export interface ComparisonReport {
-  score_difference: number;
-  key_improvements: string[];
-  remaining_issues: string[];
-  synthesis_summary: string;
-}
+// Phase 2: Document Version Comparison (NO LONGER USED - kept for reference)
+// export interface ComparisonReport {
+//   score_difference: number;
+//   key_improvements: string[];
+//   remaining_issues: string[];
+//   synthesis_summary: string;
+// }

@@ -1,8 +1,11 @@
 """Regression coverage for preservation, validation, and PDF analysis paths."""
 
 import os
+import sys
 import tempfile
 import unittest
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor

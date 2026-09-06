@@ -15,7 +15,8 @@ import {
   ChatResponse,
   ContextReport,
   ChatMessage,
-  ComparisonReport,
+  // ComparisonReport is no longer used (V1/V2 wizard removed)
+  // ComparisonReport,
 } from '../types';
 
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
@@ -177,6 +178,35 @@ export const login = async (email: string, password: string): Promise<LoginRespo
     return await response.json();
   } catch (error) {
     console.error('Error logging in:', error);
+    throw error;
+  }
+};
+
+/**
+ * Firebase Identity Provider Login
+ * Exchanges Firebase ID token for a server-issued Flask JWT access token.
+ *
+ * @param idToken - Firebase ID token string from client SDK
+ * @returns User object and Flask JWT access token
+ */
+export const firebaseLogin = async (idToken: string): Promise<LoginResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/firebase-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_token: idToken }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Firebase login verification failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error verifying Firebase ID token:', error);
     throw error;
   }
 };
@@ -352,39 +382,9 @@ export const getUserHistory = async (): Promise<{ status: string; reports: Repor
   }
 };
 
-/**
- * Phase 2: Call backend to compare Version 1 and Version 2 presentation texts
- */
-export const compareDocuments = async (
-  v1_text: string,
-  v2_text: string,
-  v1_score: number,
-  v2_score: number,
-  filename: string
-): Promise<ComparisonReport> => {
-  try {
-    const response = await fetchWithAuth(`${API_BASE_URL}/compare-documents`, {
-      method: 'POST',
-      body: JSON.stringify({
-        v1_text,
-        v2_text,
-        v1_score,
-        v2_score,
-        filename,
-      }),
-    });
-
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.message || 'Comparison failed');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error comparing documents:', error);
-    throw error;
-  }
-};
+// ===== (REMOVED) DOCUMENT COMPARISON =====
+// compareDocuments() has been removed - V1/V2 wizard replaced by single-session analysis
+// The /api/compare-documents endpoint is no longer called from the frontend
 
 // ===== UTILITIES =====
 

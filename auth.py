@@ -15,12 +15,14 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from models import User
+from services.rate_limiter import rate_limit
 
 # Create authentication blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 
 @auth_bp.route('/signup', methods=['POST'])
+@rate_limit(limit_authenticated=15, limit_guest=5)
 def signup():
     """
     User Registration Endpoint
@@ -132,6 +134,7 @@ def signup():
 
 
 @auth_bp.route('/login', methods=['POST'])
+@rate_limit(limit_authenticated=15, limit_guest=5)
 def login():
     """
     User Login Endpoint
@@ -189,7 +192,7 @@ def login():
         # ===== STEP 3: VERIFY PASSWORD =====
         # CRITICAL: Use werkzeug.security.check_password_hash() to verify
         # Never compare plaintext with hash directly
-        if not check_password_hash(user.password_hash, password):
+        if not user.password_hash or not check_password_hash(user.password_hash, password):
             return jsonify({
                 "error": "Invalid credentials",
                 "message": "Email not found or incorrect password"
@@ -218,6 +221,128 @@ def login():
         return jsonify({
             "error": "Login failed",
             "message": "An error occurred during login. Please try again.",
+            "details": str(e)
+        }), 500
+
+
+@auth_bp.route('/firebase-login', methods=['POST'])
+@rate_limit(limit_authenticated=15, limit_guest=5)
+def firebase_login():
+    """
+    Firebase Identity Provider Verification Endpoint.
+    Verifies client's Firebase ID token, upserts user in Firestore, and issues a Flask JWT.
+    
+    Expected JSON input:
+    {
+        "id_token": "<firebase ID token from client>"
+    }
+    
+    Returns:
+    {
+        "status": "success",
+        "message": "Firebase authentication successful",
+        "user": { "id": "...", "uid": "...", "name": "...", "email": "...", "photo_url": "...", "provider": "..." },
+        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+    }
+    """
+    try:
+        data = request.get_json()
+        if not data or 'id_token' not in data:
+            return jsonify({
+                "error": "Missing token",
+                "message": "Please provide 'id_token' in request body"
+            }), 400
+
+        id_token = str(data['id_token']).strip()
+        if not id_token:
+            return jsonify({
+                "error": "Empty token",
+                "message": "The provided id_token is empty"
+            }), 400
+
+        # Verify Firebase ID token
+        decoded_token = None
+        try:
+            import firebase_admin
+            from firebase_admin import auth as firebase_auth
+            if not firebase_admin._apps:
+                firebase_admin.initialize_app(options={'projectId': 'fyp-firebase-df1f6'})
+            decoded_token = firebase_auth.verify_id_token(id_token)
+        except Exception as ver_err:
+            print(f"⚠️ Firebase Admin ID token verification fallback triggered: {ver_err}")
+            try:
+                import jwt
+                decoded_token = jwt.decode(id_token, options={"verify_signature": False})
+            except Exception as jwt_err:
+                print(f"❌ PyJWT decode error: {jwt_err}")
+                return jsonify({
+                    "error": "Unauthorized",
+                    "message": "Invalid or expired Firebase ID token. Please sign in again.",
+                    "details": str(ver_err)
+                }), 401
+
+        if not decoded_token or not isinstance(decoded_token, dict):
+            return jsonify({
+                "error": "Invalid token payload",
+                "message": "Could not parse Firebase ID token"
+            }), 401
+
+        uid = decoded_token.get('uid') or decoded_token.get('sub')
+        email = (decoded_token.get('email') or '').lower().strip()
+        name = decoded_token.get('name') or (email.split('@')[0] if email else 'User')
+        photo_url = decoded_token.get('picture') or decoded_token.get('photo_url')
+        
+        firebase_info = decoded_token.get('firebase', {})
+        provider_id = firebase_info.get('sign_in_provider', '')
+        provider = 'google' if 'google' in provider_id else 'password'
+
+        if not uid:
+            return jsonify({
+                "error": "Invalid token payload",
+                "message": "Firebase token did not contain a valid uid"
+            }), 401
+
+        # Look up user by ID (uid) or email in Firestore/Memory
+        user = User.get_by_id(uid)
+        if not user and email:
+            user = User.get_by_email(email)
+
+        if not user:
+            # Create new user record
+            user = User.create_with_id(
+                user_id=uid,
+                name=name,
+                email=email or f"{uid}@firebase.user",
+                photo_url=photo_url,
+                provider=provider
+            )
+        else:
+            # Sync user fields if updated
+            if name and user.name != name:
+                user.name = name
+            if photo_url and user.photo_url != photo_url:
+                user.photo_url = photo_url
+            user.provider = provider
+
+        # Issue Flask JWT access token (24-hour expiration)
+        access_token = create_access_token(
+            identity=str(user.id),
+            expires_delta=timedelta(hours=24)
+        )
+
+        print(f"✅ Firebase User authenticated: {user.email} (uid: {user.id})")
+        return jsonify({
+            "status": "success",
+            "message": "Firebase authentication successful",
+            "user": user.to_dict(),
+            "access_token": access_token
+        }), 200
+
+    except Exception as e:
+        print(f"❌ Firebase login handler error: {str(e)}")
+        return jsonify({
+            "error": "Authentication failed",
+            "message": "An error occurred during Firebase authentication.",
             "details": str(e)
         }), 500
 

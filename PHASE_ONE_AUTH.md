@@ -17,11 +17,13 @@ Three core models define the data structure:
 
 #### User Model
 ```python
-class User(db.Model):
-    id: str (UUID)
+class User:
+    id: str (Firebase UID)
+    uid: str (Firebase UID)
     name: str
     email: str (unique)
-    password_hash: str (bcrypt hashed)
+    photo_url: str (optional)
+    provider: str ("google" or "password")
     created_at: datetime
     updated_at: datetime
 ```

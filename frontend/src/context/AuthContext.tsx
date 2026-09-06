@@ -63,7 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // ===== STEP 2: VERIFY TOKEN BY FETCHING CURRENT USER =====
           // This ensures the token is still valid
-          const response = await fetch('http://localhost:5000/api/auth/me', {
+          // Use VITE_API_BASE_URL so this works in both dev and production
+          const apiBase = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
+          const response = await fetch(`${apiBase}/auth/me`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${storedToken}`,

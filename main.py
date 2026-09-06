@@ -39,13 +39,49 @@ load_dotenv()
 socketio = SocketIO()
 
 # Import blueprints
-from auth import auth_bp, register_jwt_error_handlers
+from auth import auth_bp, register_jwt_error_handlers, signup, login, firebase_login, get_current_user
 from phase_two import phase_two_bp
 from phase_four import phase_four_bp
 from phase_five import phase_five_bp
 from phase_live import phase_live_bp, init_socketio_events
 from routes.presentation_rewriter import presentation_rewriter_bp
+from routes.question_generator import question_generator_bp
+from routes.presentation_generator import presentation_generator_bp
 from services.download_service import MAX_UPLOAD_BYTES
+import logging
+import time
+
+logger = logging.getLogger(__name__)
+
+def prewarm_ml_models():
+    """
+    Pre-warm ML models at startup in background thread to eliminate per-request model loading latency.
+    Loads spaCy, SentenceTransformer, sklearn PresentationScorer, and Coach Intent Classifier into RAM.
+    """
+    start = time.time()
+    logger.info("[PERF] Pre-warming ML models in background...")
+
+    try:
+        from nlp_module.scoring_model import load_scoring_models
+        load_scoring_models()
+    except Exception as e:
+        logger.error(f"[PERF] Could not pre-warm scoring model: {e}", exc_info=True)
+
+    try:
+        from services.viva_rag_engine import _load_sentence_model, _load_spacy
+        _load_sentence_model()
+        _load_spacy()
+    except Exception as e:
+        logger.error(f"[PERF] Could not pre-warm SentenceTransformer/spaCy: {e}", exc_info=True)
+
+    try:
+        from services.coach_intent_engine import _get_intent_classifier
+        _get_intent_classifier()
+    except Exception as e:
+        logger.error(f"[PERF] Could not pre-warm intent classifier: {e}", exc_info=True)
+
+    elapsed = time.time() - start
+    logger.info(f"[PERF] All ML models pre-warmed successfully in {elapsed:.3f}s")
 
 
 def create_app():
@@ -58,10 +94,15 @@ def create_app():
     - Error handlers
     - Blueprints
     - MongoDB connection check
+    - Async pre-warmed ML Models
     """
+    import threading
     
     # ===== CREATE FLASK APP =====
     app = Flask(__name__)
+
+    # Pre-warm ML models in background thread so server starts instantly
+    threading.Thread(target=prewarm_ml_models, daemon=True).start()
 
     # ===== JWT CONFIGURATION =====
     # CRITICAL: In production, use a strong secret key from environment variables
@@ -78,14 +119,16 @@ def create_app():
     jwt = JWTManager(app)
 
     # ===== CORS CONFIGURATION =====
-    cors_origins = os.getenv('CORS_ORIGINS', 'http://localhost:3000,http://localhost:5173')
-    parsed_origins = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
-    if not parsed_origins:
-        parsed_origins = ['*']
+    DEFAULT_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:5173']
+    cors_origins_env = os.getenv('CORS_ORIGINS', '').strip()
+    if cors_origins_env and cors_origins_env != '*':
+        parsed_origins = [o.strip() for o in cors_origins_env.split(',') if o.strip()]
+    else:
+        parsed_origins = DEFAULT_ALLOWED_ORIGINS
 
     CORS(
         app,
-        resources={r"/api/*": {
+        resources={r"/*": {
             "origins": parsed_origins,
             "allow_headers": ["Content-Type", "Authorization"],
             "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -123,6 +166,15 @@ def create_app():
     # Phase 1: Authentication
     app.register_blueprint(auth_bp)
     
+    # Compatibility blueprint for /auth without /api prefix
+    from flask import Blueprint as BP
+    auth_compat_bp = BP('auth_compat', __name__, url_prefix='/auth')
+    auth_compat_bp.add_url_rule('/firebase-login', 'firebase_login_compat', firebase_login, methods=['POST', 'OPTIONS'])
+    auth_compat_bp.add_url_rule('/login', 'login_compat', login, methods=['POST', 'OPTIONS'])
+    auth_compat_bp.add_url_rule('/signup', 'signup_compat', signup, methods=['POST', 'OPTIONS'])
+    auth_compat_bp.add_url_rule('/me', 'me_compat', get_current_user, methods=['GET', 'OPTIONS'])
+    app.register_blueprint(auth_compat_bp)
+    
     # Phase 2: Document Analysis
     app.register_blueprint(phase_two_bp)
     
@@ -139,17 +191,27 @@ def create_app():
     # New Feature: AI Presentation Rewriter
     app.register_blueprint(presentation_rewriter_bp)
 
+    # New Feature: Viva Question Generator
+    app.register_blueprint(question_generator_bp)
+
+    # New Feature: AI Presentation Generator
+    app.register_blueprint(presentation_generator_bp)
+
     # ===== HEALTH-CHECK ENDPOINT =====
     @app.route('/', methods=['GET'])
     def health_check():
-        """
-        Health check endpoint to verify the service is running.
-        """
+        """Health check endpoint to verify the service is running."""
         return jsonify({
             "status": "running",
-            "service": "FYP Final Project Backend",
-            "version": "1.0.0"
+            "service": "Presenova AI Presentation Platform",
+            "version": "1.1.0",
+            "database": "Firebase Firestore"
         }), 200
+
+    @app.route('/api/health', methods=['GET'])
+    def api_health():
+        """Render.com health check endpoint."""
+        return jsonify({"status": "ok"}), 200
 
     return app
 
@@ -162,4 +224,5 @@ if __name__ == '__main__':
 
     # Run the Flask development server wrapped with Socket.IO
     debug = os.getenv('FLASK_DEBUG', '0').strip().lower() in {'1', 'true', 'yes', 'on'}
-    socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=debug)
+    socketio.run(app, host=host, port=port, debug=debug, use_reloader=False, allow_unsafe_werkzeug=True)
+

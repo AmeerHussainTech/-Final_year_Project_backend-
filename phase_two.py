@@ -6,12 +6,13 @@ Role: Analyze uploaded documents using local text extraction and Google Gemini 1
 import os
 import tempfile
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from dotenv import load_dotenv
 import pypdf
 import docx
+from pptx import Presentation as PptxPresentation
 from models import Upload, Report
 
 # Load environment variables
@@ -19,6 +20,8 @@ load_dotenv()
 
 # Gemini API configured globally in ai_evaluator
 
+
+from services.rate_limiter import rate_limit, enforce_guest_size_limit
 
 # Create blueprint
 phase_two_bp = Blueprint('phase_two', __name__, url_prefix='/api')
@@ -48,6 +51,27 @@ def extract_text_from_file(file_path: str, file_ext: str) -> str:
         except Exception as e:
             raise ValueError(f"Failed to extract text from DOCX: {str(e)}")
             
+    elif file_ext == '.pptx':
+        try:
+            prs = PptxPresentation(file_path)
+            for slide_num, slide in enumerate(prs.slides, 1):
+                text += f"\nSlide {slide_num}:\n"
+                for shape in slide.shapes:
+                    if shape.has_text_frame:
+                        for para in shape.text_frame.paragraphs:
+                            para_text = para.text.strip()
+                            if para_text:
+                                text += para_text + "\n"
+                    # Extract table text
+                    if shape.has_table:
+                        for row in shape.table.rows:
+                            for cell in row.cells:
+                                if cell.text.strip():
+                                    text += cell.text.strip() + " "
+                        text += "\n"
+        except Exception as e:
+            raise ValueError(f"Failed to extract text from PPTX: {str(e)}")
+            
     elif file_ext == '.txt':
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -61,15 +85,50 @@ def extract_text_from_file(file_path: str, file_ext: str) -> str:
     return text.strip()
 
 
+def build_slides_from_text(text: str) -> list[dict]:
+    """Build structured slide dicts from plain extracted text for deep analysis."""
+    import re
+    if not text or not text.strip():
+        return []
+    slide_blocks = re.split(r'\n(?=Slide \d+:)', text, flags=re.IGNORECASE)
+    if len(slide_blocks) <= 1:
+        paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+        if not paragraphs:
+            paragraphs = [text]
+        chunk_size = max(1, len(paragraphs) // 5) if len(paragraphs) > 5 else 1
+        slide_blocks = ["\n".join(paragraphs[i:i+chunk_size]) for i in range(0, len(paragraphs), chunk_size)]
+    
+    slides = []
+    for idx, block in enumerate(slide_blocks, start=1):
+        lines = [line.strip() for line in block.split('\n') if line.strip()]
+        title = lines[0] if lines else f"Slide {idx}"
+        body_lines = lines[1:] if len(lines) > 1 else lines
+        textboxes = [{"paragraphs": [{"text": line} for line in body_lines]}]
+        slides.append({
+            "slide_number": idx,
+            "title": title,
+            "textboxes": textboxes,
+            "tables": 0,
+            "charts": 0,
+            "images": 0
+        })
+    return slides
+
+
 @phase_two_bp.route('/analyze-document', methods=['POST'])
 @jwt_required(optional=True)
+@rate_limit(limit_authenticated=15, limit_guest=3)
 def analyze_document():
     """
     Analyze uploaded document:
     1. Extract text locally.
-    2. Feed to Gemini 1.5 Flash for scoring, feedback, and rewrite.
-    3. Save results and upload metadata to MongoDB.
+    2. Feed to Gemini 2.5 Flash for scoring, feedback, and rewrite.
+    3. Save results and upload metadata to database.
     """
+    guest_check = enforce_guest_size_limit(max_guest_bytes=10 * 1024 * 1024)
+    if guest_check:
+        return guest_check
+
     temp_file_path = None
     
     try:
@@ -88,14 +147,14 @@ def analyze_document():
                 "message": "Please select a file to upload"
             }), 400
         
-        # Allowed file extensions
-        ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
+        # Allowed file extensions & MIME types
+        ALLOWED_EXTENSIONS = {'.pdf', '.pptx', '.docx', '.doc', '.txt'}
         file_ext = os.path.splitext(file.filename)[1].lower()
         
         if file_ext not in ALLOWED_EXTENSIONS:
             return jsonify({
                 "error": "Unsupported file format",
-                "message": f"Supported formats for extraction: {', '.join(ALLOWED_EXTENSIONS)}"
+                "message": f"Supported formats for extraction: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
             }), 400
         
         # ===== STEP 2: SECURE TEMPORARY FILE HANDLING =====
@@ -144,18 +203,58 @@ def analyze_document():
                     "Thank you for listening. We welcome any questions from the panel."
                 )
             
-        # ===== STEP 4: GENERATE 7Cs ANALYSIS VIA CENTRAL EVALUATOR =====
+        # ===== STEP 4: GENERATE 7Cs ANALYSIS & SUB-ANALYZERS =====
         from ai_evaluator import evaluate_7cs
         analysis_json = evaluate_7cs(
             text=extracted_text,
             module_type='document',
             context_metrics={"filename": file.filename}
         )
-        
+
+        # ===== STEP 5: RUN MULTI-DIMENSIONAL DEEP SUB-ANALYZERS =====
+        slides_data = []
+        if file_ext == '.pptx':
+            try:
+                from services.ppt_processor import extract_slides
+                slides_data = extract_slides(temp_file_path)
+            except Exception as _e:
+                print(f"⚠️ PPTX slide extraction fallback: {_e}")
+                slides_data = build_slides_from_text(extracted_text)
+        else:
+            slides_data = build_slides_from_text(extracted_text)
+
+        try:
+            import dataclasses
+            from services.analysis.statistics import compute_presentation_statistics
+            from services.analysis.design import DesignAnalyzer
+            from services.analysis.consistency import ConsistencyAnalyzer
+            from services.analysis.accessibility import AccessibilityAnalyzer
+            from services.analysis.storytelling import StorytellingAnalyzer
+            from services.analysis.speaker import SpeakerAnalyzer
+            from services.analysis.duplicate_detector import DuplicateDetector
+
+            stats = compute_presentation_statistics(slides_data)
+            design_res = DesignAnalyzer().analyze(slides_data)
+            consistency_res = ConsistencyAnalyzer().analyze(slides_data)
+            accessibility_res = AccessibilityAnalyzer().analyze(slides_data)
+            storytelling_res = StorytellingAnalyzer().analyze(slides_data)
+            speaker_res = SpeakerAnalyzer().analyze(slides_data)
+            duplicate_res = DuplicateDetector().analyze(slides_data)
+
+            analysis_json["presentation_statistics"] = dataclasses.asdict(stats)
+            analysis_json["design_analysis"] = design_res
+            analysis_json["consistency_analysis"] = consistency_res
+            analysis_json["accessibility_analysis"] = accessibility_res
+            analysis_json["storytelling_analysis"] = storytelling_res
+            analysis_json["speaker_analysis"] = speaker_res
+            analysis_json["duplicate_detection"] = duplicate_res
+        except Exception as _ae:
+            print(f"⚠️ Sub-analyzers execution notice: {_ae}")
+
         # Inject original text and metadata
         analysis_json["original_text"] = extracted_text
         analysis_json["status"] = "success"
-        analysis_json["analysis_timestamp"] = datetime.utcnow().isoformat()
+        analysis_json["analysis_timestamp"] = datetime.now(timezone.utc).isoformat()
         
         # ===== STEP 7: SAVE TO DATABASE (MongoDB) =====
         user_id = get_jwt_identity() or "guest"
@@ -176,7 +275,7 @@ def analyze_document():
             upload_id=upload_record.id
         )
         
-        print(f"✅ Analysis complete and saved to MongoDB for: {file.filename}")
+        print(f"✅ Full multi-dimensional analysis complete and saved to MongoDB for: {file.filename}")
         return jsonify(analysis_json), 200
         
     except json.JSONDecodeError as e:

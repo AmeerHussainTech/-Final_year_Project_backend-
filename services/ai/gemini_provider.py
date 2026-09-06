@@ -84,9 +84,9 @@ class GeminiProvider(AIProvider):
         max_retries: int = 2,
     ):
         self.api_key = api_key or os.getenv('GEMINI_API_KEY', '').strip()
-        self.model_name = model or os.getenv('GEMINI_MODEL', 'gemini-2.5-flash').strip()
+        self.model_name = model or os.getenv('GEMINI_MODEL', 'gemini-3.6-flash').strip()
         self.fallback_models = fallback_models or [
-            m.strip() for m in os.getenv('GEMINI_FALLBACK_MODELS', 'gemini-2.5-flash-lite').split(',') if m.strip()
+            m.strip() for m in os.getenv('GEMINI_FALLBACK_MODELS', 'gemini-3.5-flash-lite').split(',') if m.strip()
         ]
         self.timeout_seconds = max(1.0, timeout_seconds or _env_float('GEMINI_TIMEOUT_SECONDS', 45.0))
         self.max_retries = max(1, max_retries or _env_int('GEMINI_MAX_RETRIES', 2))

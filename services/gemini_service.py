@@ -57,11 +57,11 @@ def _env_float(name: str, default: float) -> float:
 
 # ── Configuration ───────────────────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '').strip()
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash').strip()
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.6-flash').strip()
 MODEL_CANDIDATES = [
     model for model in [
         GEMINI_MODEL,
-        *os.getenv('GEMINI_FALLBACK_MODELS', 'gemini-2.5-flash-lite').split(','),
+        *os.getenv('GEMINI_FALLBACK_MODELS', 'gemini-3.5-flash-lite').split(','),
     ] if model.strip()
 ]
 GEMINI_TIMEOUT_SECONDS = max(1.0, _env_float('GEMINI_TIMEOUT_SECONDS', 45.0))

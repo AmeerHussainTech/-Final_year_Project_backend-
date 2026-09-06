@@ -69,9 +69,8 @@ class SmartFilter:
                 to_skip.append(slide)
 
         logger.info(
-            "[smart_filter] %d slides to rewrite, %d skipped (%.0f%% saved)",
+            "[smart_filter] %d slides to rewrite, %d skipped",
             len(to_rewrite), len(to_skip),
-            (len(to_skip) / max(len(slides), 1)) * 100,
         )
         return to_rewrite, to_skip
 
@@ -103,61 +102,30 @@ class SmartFilter:
         slide: dict,
         quality_scores: Optional[dict] = None,
     ) -> dict:
-        """Assess whether a slide needs rewriting.
-
-        Returns dict with: should_rewrite, reason, quality_score.
-        """
-        slide_num = slide.get('slide_number')
-
-        # Check if we have prior quality scores
-        if quality_scores and slide_num in quality_scores:
-            score = quality_scores[slide_num].get('overall', 0)
-            if score >= self.quality_threshold * 100:
-                return {
-                    'should_rewrite': False,
-                    'reason': f'High quality score ({score}/100)',
-                    'quality_score': score,
-                }
-
-        # Check each textbox
+        """Assess whether a slide needs rewriting."""
         textboxes = slide.get('textboxes', [])
-        if not textboxes:
+        tables = slide.get('tables_data', []) or slide.get('tables', [])
+        
+        # If slide has no text, skip
+        has_text = False
+        for tb in textboxes:
+            paras = [p.get('text', '') if isinstance(p, dict) else str(p) for p in tb.get('paragraphs', [])]
+            if any(p.strip() for p in paras):
+                has_text = True
+                break
+        
+        if not has_text and not tables:
             return {
                 'should_rewrite': False,
-                'reason': 'No textboxes to rewrite',
+                'reason': 'No text content to rewrite',
                 'quality_score': 100,
             }
 
-        # Check if ALL textboxes are high quality
-        all_high_quality = all(
-            self._is_high_quality_text(tb) for tb in textboxes
-        )
-        if all_high_quality:
-            return {
-                'should_rewrite': False,
-                'reason': 'All textboxes are already high quality',
-                'quality_score': 85,
-            }
-
-        # Check title quality
-        title = slide.get('title', '')
-        if title and self._title_is_good(title):
-            # Still need to check content textboxes
-            content_needs = [
-                tb for tb in textboxes
-                if not self._is_high_quality_text(tb)
-            ]
-            if content_needs:
-                return {
-                    'should_rewrite': True,
-                    'reason': f'{len(content_needs)} textboxes need improvement',
-                    'quality_score': 70,
-                }
-
+        # Always rewrite slides with content so user gets actual AI improvements
         return {
             'should_rewrite': True,
-            'reason': 'Content needs quality improvement',
-            'quality_score': 50,
+            'reason': 'Content needs quality improvement and tone refinement',
+            'quality_score': 60,
         }
 
     def _textbox_needs_rewrite(self, textbox: dict) -> bool:

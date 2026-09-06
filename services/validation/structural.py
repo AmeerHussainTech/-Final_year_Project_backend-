@@ -82,8 +82,16 @@ class StructuralValidator:
                 shape_count_match = False
 
             # Check table count
-            orig_table_count = len(orig.get('tables_data', []))
-            rew_table_count = len(rew.get('tables', []))
+            orig_tables = orig.get('tables_data') or orig.get('tables') or []
+            if isinstance(orig_tables, int):
+                orig_table_count = orig_tables
+            else:
+                orig_table_count = len(orig_tables)
+            rew_tables = rew.get('tables') or []
+            if isinstance(rew_tables, int):
+                rew_table_count = rew_tables
+            else:
+                rew_table_count = len(rew_tables)
             if orig_table_count != rew_table_count:
                 issues.append({
                     'type': 'table_count',
@@ -93,8 +101,16 @@ class StructuralValidator:
                 shape_count_match = False
 
             # Check chart count
-            orig_chart_count = len(orig.get('charts_data', []))
-            rew_chart_count = len(rew.get('charts', []))
+            orig_charts = orig.get('charts_data') or orig.get('charts') or []
+            if isinstance(orig_charts, int):
+                orig_chart_count = orig_charts
+            else:
+                orig_chart_count = len(orig_charts)
+            rew_charts = rew.get('charts') or []
+            if isinstance(rew_charts, int):
+                rew_chart_count = rew_charts
+            else:
+                rew_chart_count = len(rew_charts)
             if orig_chart_count != rew_chart_count:
                 issues.append({
                     'type': 'chart_count',

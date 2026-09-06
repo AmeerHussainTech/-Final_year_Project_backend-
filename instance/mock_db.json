@@ -2,25 +2,1308 @@
   "users": [
     {
       "id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "uid": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
       "name": "Fatima Ahmed",
       "email": "fatimaahmed@gmail.com",
-      "password_hash": "scrypt:32768:8:1$0gObnePbHrRl9llT$b9930ca6fcfd64b4712d50296834702bab1b725ca56957fc179a38bbe8e02cf94c0ad44d157254df32854eaa426fdb4dd44a697d94806f63a080b5ada96e2e54",
+      "photo_url": null,
+      "provider": "google",
       "created_at": "2026-07-11T00:30:16.645000",
       "updated_at": "2026-07-11T00:30:16.645000",
       "_id": "6a518e9819e7e2671bc78526"
     },
     {
       "id": "4aa09d99-824e-4496-a33a-f4d198cb54fa",
+      "uid": "4aa09d99-824e-4496-a33a-f4d198cb54fa",
       "name": "Fatima Ahmed",
       "email": "fatimaahmedwarsi@gmail.com",
-      "password_hash": "scrypt:32768:8:1$BRJfPIcxcTRh7gJ3$b4f68232562c329d91ed7b530b2ba20f4a3810195cefcdd8e33b50679d05069a746eb24fb7d0843392f4684edeffd336279984afe1cc720b41215498047fc4c0",
+      "photo_url": null,
+      "provider": "google",
       "created_at": "2026-07-12T02:01:18.242000",
       "updated_at": "2026-07-12T02:01:18.242000",
       "_id": "6a52f56e743da0961381a031"
+    },
+    {
+      "id": "e9bdac5e-7b72-46ad-afaa-1fd817f2507a",
+      "uid": "e9bdac5e-7b72-46ad-afaa-1fd817f2507a",
+      "name": "testuser",
+      "email": "test@example.com",
+      "photo_url": null,
+      "provider": "password",
+      "created_at": "2026-07-24T22:32:29.583000",
+      "updated_at": "2026-07-24T22:32:29.583000",
+      "_id": "6a63e7fd8c8fc784071afebc"
+    },
+    {
+      "id": "d6a18a38-d63a-4229-8f5d-6af7af30af4e",
+      "uid": "d6a18a38-d63a-4229-8f5d-6af7af30af4e",
+      "name": "Test",
+      "email": "test@test.com",
+      "photo_url": null,
+      "provider": "password",
+      "created_at": "2026-07-24T23:43:00.968000",
+      "updated_at": "2026-07-24T23:43:00.968000",
+      "_id": "6a63f88440e3faccdb88a265"
     }
   ],
-  "uploads": [],
-  "reports": [],
+  "uploads": [
+    {
+      "id": "9e21a1bd-526a-45d3-abea-70c137f82c2f",
+      "filename": "Fatima_Ahmed_Resume .pdf",
+      "mime_type": "application/pdf",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmp7hztg2pu.pdf",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-25T01:25:43.513000",
+      "_id": "6a6410977998d2fac0434c98"
+    },
+    {
+      "id": "f35b6017-ba9d-411a-8796-3da3a8b71b00",
+      "filename": "Speech_Delivery_Progress_Report.pdf",
+      "mime_type": "application/pdf",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpp_q98jcp.pdf",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-25T01:26:28.989000",
+      "_id": "6a6410c47998d2fac0434c9a"
+    },
+    {
+      "id": "d7dd98b4-00a7-4626-a0af-1a2a5815a520",
+      "filename": "Presenova_FYP_Plan.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmph60d3_hv.docx",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-26T20:54:12.839000",
+      "_id": "6a6673f4fa7393525c02ade2"
+    },
+    {
+      "id": "e4f54fd5-180e-4680-a76d-edefb5b2c07d",
+      "filename": "Fatima_Ahmed_Resume_Developer.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpx1gx0s9q.docx",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T01:18:43.003000",
+      "_id": "6a66b1f38e5f7b73cbdf0fa6"
+    },
+    {
+      "id": "87b2ea2f-3fb3-445a-9d1a-287c4422fbf8",
+      "filename": "Presenova_FYP_Plan.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpn6n_hz9k.docx",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T01:21:06.617000",
+      "_id": "6a66b2828e5f7b73cbdf0fa9"
+    },
+    {
+      "id": "9060d46e-410b-49a1-b88c-9c580aebade6",
+      "filename": "speech.wav",
+      "mime_type": "audio/wav",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpmqpczo8s.wav",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T02:27:40.642000",
+      "_id": "6a66c21cebcb688ce3d6642b"
+    },
+    {
+      "id": "5c04173a-063a-4a20-ab91-53245e15685d",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpem8y28o3.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T02:33:15.612000",
+      "_id": "6a66c36bebcb688ce3d6642d"
+    },
+    {
+      "id": "f2692865-bf4f-4060-aff5-7960a1d4c93e",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpmoxu2hr_.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T02:35:13.526000",
+      "_id": "6a66c3e1f624b27748f7ff72"
+    },
+    {
+      "id": "55661d95-e6d6-4042-ac39-0bf93e3ca9ac",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmptnxii6li.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T02:37:04.782000",
+      "_id": "6a66c450f624b27748f7ff74"
+    },
+    {
+      "id": "6d08a1c2-cbac-4723-a667-7ae47a5ed584",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpe0tvisv2.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-27T02:41:15.457000",
+      "_id": "6a66c54bce6c408684511680"
+    },
+    {
+      "id": "dddacf91-2622-41bb-9190-ce296a5086f7",
+      "filename": "Presenova_FYP_Plan.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmp_t38a7ye.docx",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T06:54:45.790000",
+      "_id": "6a6852355b233312fce4a167"
+    },
+    {
+      "id": "c515a1b8-b52f-4366-9a7d-2bc172d18c51",
+      "filename": "Presenova_FYP_Plan.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpjo5rnhdq.docx",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T06:55:49.823000",
+      "_id": "6a6852755b233312fce4a169"
+    },
+    {
+      "id": "fb800cf8-3d82-4c62-a45c-a54f840f91a2",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpknefno1s.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T06:56:49.721000",
+      "_id": "6a6852b15b233312fce4a16b"
+    },
+    {
+      "id": "c63949c7-9fd3-41d6-9284-8df5012ba97c",
+      "filename": "Speech_Analysis_Report.pdf",
+      "mime_type": "application/pdf",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpnwa7oxge.pdf",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T07:25:02.401000",
+      "_id": "6a68594e5b233312fce4a16f"
+    },
+    {
+      "id": "2bc11a7f-d247-4896-9932-1d28b8a626b5",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpoj7pk7to.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T07:25:33.910000",
+      "_id": "6a68596d5b233312fce4a171"
+    },
+    {
+      "id": "ac842e30-78ce-4a55-85a6-196e44e1cfaf",
+      "filename": "speech.webm",
+      "mime_type": "audio/webm",
+      "file_path": "C:\\Users\\fatim\\AppData\\Local\\Temp\\tmpd3exk_nm.webm",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "created_at": "2026-07-28T07:26:10.842000",
+      "_id": "6a6859925b233312fce4a173"
+    }
+  ],
+  "reports": [
+    {
+      "id": "96a8f734-0f2f-4d68-a152-0dffbec62a49",
+      "report_json": {
+        "overall_score": 82,
+        "document_name": "Fatima_Ahmed_Resume .pdf",
+        "category_scores": {
+          "Structure": 85,
+          "Clarity": 88,
+          "Persuasion": 78,
+          "Content_Quality": 82,
+          "Call_to_Action": 65,
+          "Grammar_and_Syntax": 90,
+          "Accuracy": 85,
+          "Tone_Appropriateness": 92,
+          "Audience_Alignment": 82,
+          "Purpose_Fulfillment": 80
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The document clearly highlights the candidate's education, core competencies, and software engineering project history with well-defined sections. However, combining presentation slides and resume formats creates slight ambiguity regarding the document's primary medium.",
+          "Concise": "Bullet points effectively summarize key technical skill sets and project contributions without excessive fluff. Some skill listings under technical skills contain minor redundancies across tools and frameworks.",
+          "Correct": "Grammar, spelling, and technical terminology are largely accurate throughout the text. The timeline logic contains a slight discrepancy regarding a 2023\u20132026 8th-semester BS timeline.",
+          "Complete": "All essential resume and portfolio presentation components\u2014including contact info, summary, education, certifications, and project experience\u2014are present. A dedicated concluding call-to-action slide or contact closing statement is missing.",
+          "Courteous": "The tone is professional, respectful, and highly appropriate for academic and corporate recruiting contexts. It maintains an engaging and constructive voice.",
+          "Concrete": "Projects list specific stack details and frameworks, providing tangible evidence of skill. Adding quantifiable metrics (e.g., user adoption, performance improvements) would make the project achievements far more impactful.",
+          "Consistent": "Formatting, bullet usage, and date formats remain uniform across all project entries. Section headings follow a standardized casing and structural flow."
+        },
+        "seven_cs_scores": {
+          "Clear": 88,
+          "Concise": 85,
+          "Correct": 90,
+          "Complete": 82,
+          "Courteous": 92,
+          "Concrete": 80,
+          "Consistent": 85
+        },
+        "strengths": [
+          "Summary Section: Succinctly distills key technical proficiencies (Python, MERN stack, MVC architecture) and community engagement (GDSC/JTech) right at the beginning.",
+          "Projects Section: Accurately specifies tech stacks used for each software project, demonstrating practical full-stack execution across multiple frameworks.",
+          "Certifications Section: Emphasizes relevant and modern industry skills, particularly generative AI, Google Prompting frameworks, and MERN development."
+        ],
+        "recommendations": [
+          "Projects Section: Incorporate quantifiable impact metrics (e.g., percentage optimization, user query latency reduction, UI engagement rates) to strengthen concrete persuasion.",
+          "Education & Timeline: Clarify the timeline details for the BS program (2023 to 2026 expected while currently in the 8th semester) to ensure complete logical consistency.",
+          "Concluding Section: Add an explicit slide or statement with a call-to-action directing recruiters/investors on how to initiate contact or schedule a technical demo."
+        ],
+        "detailed_feedback": "The presented text provides a solid foundation for a candidate profile or presentation deck, demonstrating strong technical diversity across Python, Java, web stacks, and database systems. The professional tone, proper categorization, and structured layout make it easy for technical recruiters or hiring managers to assess technical competencies rapidly. The overall layout reflects high clarity and consistency, adhering well to modern technical communication standards.\n\nHowever, there are areas where structural and persuasive elements can be enhanced. While project descriptions highlight technical stacks accurately, they lack measurable business outcomes or technical metrics\u2014such as database load efficiency, API performance, or user uptake\u2014which would substantially elevate the persuasive depth of the presentation. Additionally, the timeline indicating a 2023 start date with an 8th-semester standing by 2026 could benefit from minor clarify formatting to avoid confusion regarding academic pacing.\n\nTo transform this profile into a high-impact presentation or portfolio script, the content should be structured with explicit slide transitions, narrative storytelling around key technical projects, and a closing Call to Action slide inviting recruiters to engage further.",
+        "improved_text": "SLIDE 1: TITLE SLIDE\nHeadline: Fatima Ahmed \u2014 Software Engineering Candidate & Full-Stack Developer\nContact Information: Karachi, Pakistan | +92-323-3216487 | fatimaahmedwarsi@gmail.com | linkedin.com/in/fatima-ahmed-0667241b7\nPresenter Script: \"Hello everyone. My name is Fatima Ahmed, a final-year Software Engineering student at Jinnah University for Women. Today, I am excited to present my journey, technical skill set, and portfolio of full-stack engineering projects.\"\n\nSLIDE 2: EXECUTIVE SUMMARY\nHeadline: Professional Overview\n- 8th Semester BS Software Engineering Candidate (Expected Graduation: 2026)\n- Core Specializations: Full-Stack Web Development, MERN Stack, MVC Architecture, OOP, and Database Systems\n- Tech Community Leader: Active contributor to Google Developer Groups on Campus (GDGoC) & JTech\nPresenter Script: \"Over the course of my degree, I have specialized in building scalable full-stack applications using Python, Java, PHP, JavaScript, and the MERN stack. Beyond coding, I am deeply involved in technical communities, serving as a video media lead and project presenter to bridge engineering with impactful presentation.\"\n\nSLIDE 3: TECHNICAL PROFICIENCIES & CERTIFICATIONS\nHeadline: Technical Toolkit & Industry Certifications\n- Languages: Python, Java, C++, C#, PHP, JavaScript, SQL\n- Frameworks & Web: React, Node.js, Express.js, ASP.NET, HTML5/CSS3\n- Databases & Tools: MongoDB, MySQL, Firebase, Docker, Git, VS Code, Power BI\n- Certifications (2025): Google Prompting Essentials, Build with AI Workshop (Gemini/Vertex AI), ScaleX MERN Stack\nPresenter Script: \"My technical toolkit spans modern front-end and back-end stacks alongside specialized databases. Recently, I completed Google AI certification workshops focusing on prompt engineering frameworks and generative AI prototyping using Vertex AI and Gemini.\"\n\nSLIDE 4: FEATURED PROJECTS \u2014 FULL-STACK & SYSTEM DESIGN\nHeadline: Engineering Highlights & Portfolio\n- E-commerce Platform (MERN Stack): Built complete authentication, product catalog, cart logic, and RESTful APIs.\n- Library Management Systems: Architected dual implementations utilizing MVC pattern alongside SQL and Firebase integration.\n- SDG Plastic-Free Initiative: Co-led an entrepreneurial venture aligned with UN SDGs 12 & 13, marketing hand-painted eco-tote bags.\nPresenter Script: \"My project portfolio highlights real-world applications of full-stack engineering and software architecture. Key projects include a full-featured MERN E-commerce platform, modular Library Management systems designed with MVC architecture, and an award-winning UN SDG sustainability initiative.\"\n\nSLIDE 5: LEADERSHIP, VOLUNTEERING & NEXT STEPS\nHeadline: Leadership & Professional Call to Action\n- Event Leadership: Project Presenter & Media Volunteer for GDGoC & JTech Exhibitions\n- Languages: English, Urdu\n- Next Steps: Seeking Full-Stack Engineering & Software Development Roles\nPresenter Script: \"Through my leadership roles in GDGoC and campus exhibitions, I have refined both my technical execution and collaborative skills. Thank you for your time, and I welcome the opportunity to discuss how my technical expertise can bring value to your organization. Let's connect!\"",
+        "original_text": "FATIMA AHMED\nSoftware Engineering Student\nKarachi, Pakistan | +92-323-3216487 | fatimaahmedwarsi@gmail.com | linkedin.com/in/fatima-ahmed-0667241b7\nSUMMARY\nSoftware Engineering student (8th Semester, BSSE, Jinnah University for Women, expected 2026) with hands-on experience in\nPython, Java, PHP, JavaScript, MySQL, and the MERN stack. Skilled in Digital Logic Design, OOP, MVC architecture, and full-\nstack web development. Active contributor to GDSC and JTech tech-community initiatives, with a strong interest in real-world\nproject execution and continuous learning.\nEDUCATION\nBS in Software Engineering \u2014 Jinnah University for Women (JUW) 2023 \u2013 Expected 2026\nKarachi, Pakistan | Currently in 8th Semester\nIntermediate (Pre-Medical) \u2014 Board of Intermediate Education Karachi (BIEK) 2020 \u2013 2022\nCERTIFICATIONS\n\u25cf Google Prompting Essentials \u2014 5-step prompting framework (Task, Context, References, Evaluate, Iterate), 2025\n\u25cf Build with AI Workshop \u2014 Generative AI prototyping with Gemini, Google AI Studio & Vertex AI, 2025\n\u25cf ScaleX Workshop \u2014 Hands-on MERN Stack development, 2025\nTECHNICAL SKILLS\nProgramming Languages: Python, Java, C++, C#, PHP, JavaScript, SQL\nWeb Development: HTML, CSS, React, Node.js, Express.js, ASP.NET, MERN Stack\nDatabases: MySQL, SQL Server, Firebase, MongoDB\nTools: VS Code, NetBeans, Git, Docker, Xampp, Wireshark, Kali Linux, Power BI, Tableau\nCore Concepts: OOP, Data Structures & Algorithms, MVC Architecture, Digital Logic Design, Software Design Patterns, Web\nSecurity\nSoft Skills: Communication, Teamwork, Leadership, Problem-Solving, Time Management, Adaptability\nPROJECTS\nE-commerce Platform \u2014 Full-Stack MERN Apr \u2013 Jun 2025\n\u25cf Built product listing, shopping cart, user authentication, and order management using MongoDB, Express.js, React,\nand Node.js\n\u25cf Implemented RESTful APIs and integrated database with front-end for a seamless user experience\nLibrary Management System \u2014 MVC Architecture May 2025\n\u25cf Designed the system following Model-View-Controller architecture for scalable, maintainable code\nLibrary Management System \u2014 SQL & Firebase Oct \u2013 Dec 2024\n\u25cf Implemented data storage, retrieval, and real-time updates for books, members, and transactions\nGym Management System \u2014 Java (OOP) Oct \u2013 Dec 2023\n\u25cf Applied class design, inheritance, and encapsulation principles to build a modular management system\nMinesweeper Game \u2014 Python Apr \u2013 Jul 2023\n\u25cf Developed a fully functional game with GUI, applying logical algorithms and problem-solving\nEntrepreneurship Project \u2014 SDG Goal-Based Plastic-Free Initiative Feb \u2013 Jul 2025\n\u25cf Led a sustainability-focused venture aligned with UN SDG 12 & 13, creating and selling eco-friendly, hand-painted\ncloth tote bags as a plastic alternative\nVOLUNTEERING & EXTRACURRICULAR\nProject Presenter \u2014 JTech 2024 (Digital Logic Design), JUW 2024\n\u25cf Presented a hardware-based project at the annual tech exhibition and explained its real-world application to\nattendees\nSocial Media Team Member (Event Volunteer) \u2014 JTech 2025, JUW 2025\n\u25cf Managed social media visibility and digital content distribution during the tech exhibition\nVideography & Media Volunteer \u2014 Google Developer Groups on Campus (GDGoC), JUW1 Year, 2024 \u2013 2025\n\u25cf Captured and edited event videos, highlights, and reels for tech workshops and speaker sessions\nLANGUAGES\nEnglish, Urdu",
+        "status": "success",
+        "analysis_timestamp": "2026-07-25T01:25:43.513248"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "9e21a1bd-526a-45d3-abea-70c137f82c2f",
+      "created_at": "2026-07-25T01:25:43.541000",
+      "updated_at": "2026-07-25T01:25:43.541000",
+      "_id": "6a6410977998d2fac0434c99"
+    },
+    {
+      "id": "55b02eed-ff1d-4982-b9f7-15fa5946a786",
+      "report_json": {
+        "overall_score": 52,
+        "document_name": "Speech_Delivery_Progression_Report.pdf",
+        "category_scores": {
+          "Structure": 65,
+          "Clarity": 50,
+          "Persuasion": 40,
+          "Content_Quality": 45,
+          "Call_to_Action": 35,
+          "Grammar_and_Syntax": 60,
+          "Accuracy": 30,
+          "Tone_Appropriateness": 70,
+          "Audience_Alignment": 50,
+          "Purpose_Fulfillment": 40
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The document's main message is severely undermined by direct contradictions between the automated text feedback and the numerical scoring data.",
+          "Concise": "The document is brief, but it lacks essential explanatory context and includes unformatted system output clutter.",
+          "Correct": "The report contains critical calculation presentation errors, unrounded floating-point metrics, and incorrect sign usage like '+-15 Points'.",
+          "Complete": "The report lacks vital context explaining why scores dropped significantly across all dimensions and offers no detailed script breakdown.",
+          "Courteous": "The tone is supportive and professional, though praising a user after a noticeable performance drop comes across as automated and insincere.",
+          "Concrete": "While tabular metrics are present, the qualitative narrative fails to provide concrete details grounding the score drop.",
+          "Consistent": "The document exhibits major logic inconsistencies between numerical indicators of decline and enthusiastic verbal praise."
+        },
+        "seven_cs_scores": {
+          "Clear": 50,
+          "Concise": 65,
+          "Correct": 30,
+          "Complete": 40,
+          "Courteous": 70,
+          "Concrete": 50,
+          "Consistent": 35
+        },
+        "strengths": [
+          "Section 1 & 2: Clear structured presentation of baseline vs. revision metrics in a side-by-side comparative table.",
+          "Section 3: Inclusion of key objective delivery indicators including word count, speaking pace (WPM), and filler word counts.",
+          "Section 5: Actionable checklist format for remaining improvement areas, giving the speaker clear focus points."
+        ],
+        "recommendations": [
+          "Section 4: Resolve the fundamental logic flaw in the AI synthesis narrative to correctly address score regressions rather than labeling a drop from 80 to 65 as 'solid progress'.",
+          "Section 3: Sanitize data output formatting to eliminate long floating-point tail errors (e.g., round '-32.89999999999999 WPM' to '-32.9 WPM').",
+          "Section 1: Standardize mathematical notation by replacing non-standard string tokens like '+-15 Points' with explicit negative indicators (-15 Points)."
+        ],
+        "detailed_feedback": "The Speech Delivery Progression Report provides a clean data table structure, but it suffers from severe logical, mathematical, and generative narrative flaws. The primary breakdown occurs in the AI Coach Progress Synthesis (Section 4), where the text explicitly states 'You made solid progress' and praises layout improvements, completely ignoring that the overall score regressed from 80/100 to 65/100, with every single sub-category dropping by 15%. This creates an alarming disconnect between automated data collection and qualitative summary text.\n\nFrom a technical and formatting standpoint, the document displays raw software bugs. The difference in speaking pace is rendered as '-32.89999999999999 WPM', indicating a lack of decimal rounding logic in the reporting pipeline. Furthermore, Section 1 lists the score progress gain as '+-15 Points', which is ambiguous and mathematically improper.\n\nTo transform this document into an effective feedback tool, the synthesized narrative must accurately reflect the performance drop, explain the underlying causes (such as an excessively slow pace of 76.67 WPM and low content volume of 23 words), and provide constructive coaching strategies to help the presenter regain their baseline momentum.",
+        "improved_text": "Speech Delivery Progression Report\nPracticed Topic/File: Speech Practice Session\nGenerated on: 07/07/2026\n\n1. Executive Score Summary\n- Version 1 (Baseline): 80 / 100\n- Version 2 (Revision): 65 / 100\n- Net Performance Change: -15 Points\n\n2. Performance Category Breakdown\n- Structure: Baseline 78% | Revision 63% (-15%)\n- Clarity: Baseline 75% | Revision 60% (-15%)\n- Persuasion: Baseline 76% | Revision 61% (-15%)\n- Content Quality: Baseline 72% | Revision 57% (-15%)\n- Call to Action: Baseline 70% | Revision 55% (-15%)\n\n3. Vocal & Delivery Metrics\n- Total Word Count: Version 1: 42 words | Version 2: 23 words (Decrease of 19 words)\n- Speaking Pace: Version 1: 109.6 WPM | Version 2: 76.7 WPM (Decrease of 32.9 WPM)\n- Filler Words Count: 0 in both versions\n- Word Repetitions: 0 in both versions\n\n4. Performance Synthesis & Coach Analysis\nYour second practice run showed a notable drop in overall performance, moving from 80/100 down to 65/100. While your delivery remains free of filler words, your speaking pace slowed significantly to 76.7 WPM, and your total content was reduced nearly in half. This over-simplification negatively impacted your clarity, structure, and persuasiveness scores. Focus on expanding your core message while restoring a natural speaking pace of 110\u2013130 WPM.\n\n5. Action Plan & Next Steps\nKey Accomplishments:\n[x] Zero filler words or verbal crutches used across both attempts.\n\nPriority Areas for Improvement:\n[ ] Content Volume: Re-expand your presentation script to restore crucial detail and context.\n[ ] Delivery Pace: Increase speaking speed to maintain audience engagement.\n[ ] Call to Action: Craft a clear, persuasive final slide to drive your message home.",
+        "original_text": "Speech Delivery Progression Report\nPracticed Topic/File: Speech Practice Session Generated on: 07/07/2026\n1. Score Progression Summary\nVersion 1 (Baseline) Version 2 (Revision) Overall Progress Gain\n80 / 100 65 / 100 +-15 Points\n2. Performance Category Scores\nCategory / Dimension V1 Score V2 Score Progress\nStructure 78% 63% -15%\nClarity 75% 60% -15%\nPersuasion 76% 61% -15%\nContent Quality 72% 57% -15%\nCall to Action 70% 55% -15%\n3. Visual & Vocal Delivery Metrics\nMetric Label Version 1 Version 2 Difference\nWord Count 42 words 23 words -19 words\nSpeaking Pace (WPM) 109.57 WPM 76.67 WPM -32.89999999999999 WPM\nFiller Words Count 0 0 0\nWord Repetitions 0 0 0\n4. AI Coach Progress Synthesis\nYou made solid progress in revising this presentation. Your score moved from 80/100 to 65/100. The layout shows\nbetter organization and structure. Continue practicing your verbal delivery to match these visual improvements!\n5. Recommendations & Outcomes\nKey Improvements Achieved:\nPage 1 of 2Generated by AI Presentation & Pitch Analyzer\n[x] Minor edits made, but overall score decreased. Review structure.\nRemaining Areas to Polish:\n[ ] Continue working on bullet-point formatting to avoid text clutter.\n[ ] Inject concrete statistics or metrics to make points more concrete.\n[ ] Improve concluding call-to-action slide.\nPage 2 of 2Generated by AI Presentation & Pitch Analyzer",
+        "status": "success",
+        "analysis_timestamp": "2026-07-25T01:26:28.989020"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "f35b6017-ba9d-411a-8796-3da3a8b71b00",
+      "created_at": "2026-07-25T01:26:29.057000",
+      "updated_at": "2026-07-25T01:26:29.057000",
+      "_id": "6a6410c57998d2fac0434c9b"
+    },
+    {
+      "id": "a62375e4-c125-4297-a12a-69f156c3b217",
+      "report_json": {
+        "overall_score": 58,
+        "document_name": "Presenova_FYP_Plan.docx",
+        "category_scores": {
+          "Structure": 55,
+          "Clarity": 70,
+          "Persuasion": 62,
+          "Content_Quality": 50,
+          "Call_to_Action": 45,
+          "Grammar_and_Syntax": 85,
+          "Accuracy": 75,
+          "Tone_Appropriateness": 80,
+          "Audience_Alignment": 60,
+          "Purpose_Fulfillment": 56
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The high-level objective and core features are clearly stated using direct feature labels. However, the exact technical execution and status of specific modules remain ambiguous without deeper contextual details.",
+          "Concise": "The document is brief and avoids unnecessary wordiness, presenting high-level takeaways efficiently. However, it borders on being overly brief, omitting necessary project specifications.",
+          "Correct": "Grammar and technical terms are accurate, with appropriate usage of stack terminology like React and FastAPI. Formatting is slightly disjointed due to loose status indicators at the top.",
+          "Complete": "The text lacks critical information, such as explanations for the 9 missing features, implementation timelines, and architectural breakdown. Key presentation components like an explicit agenda and structured conclusion are absent.",
+          "Courteous": "The tone is formal, objective, and respectful, making it suitable for an academic supervisor update. It presents project progress neutrally without overly defensive language.",
+          "Concrete": "While specific metrics like '13 of 23 planned features' are provided, individual feature descriptions lack supporting technical details, stack integration points, or precise completion criteria.",
+          "Consistent": "The document uses consistent technical terminology, but the list formatting varies between numbered core features and lettered sub-features without explicit visual hierarchy."
+        },
+        "seven_cs_scores": {
+          "Clear": 70,
+          "Concise": 82,
+          "Correct": 88,
+          "Complete": 45,
+          "Courteous": 85,
+          "Concrete": 52,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Slide 1 (Header & Master Checklist): Provides a clear quantitative status breakdown (13 implemented, 1 partial, 9 missing), immediately giving the reviewer key progress metrics.",
+          "Slide 1 (Summary for Supervisor): Effectively highlights four distinct competitive differentiators (e.g., 7C analysis on speech and written docs), establishing product uniqueness.",
+          "Slide 1 (Priority Additions): Clearly identifies strategic next steps (Expert Validation, Audience-Adaptive Scoring) to achieve both academic rigor and commercial viability."
+        ],
+        "recommendations": [
+          "Slide 1 (Feature Blueprint): Expand the feature list into distinct slides or structured modules, explicitly defining what tech stack endpoints apply to each feature.",
+          "Slide 1 (Master Checklist): Detail the 9 missing features explicitly alongside target completion deadlines and risk mitigations to give a complete roadmap.",
+          "Slide 1 (Summary Section): Add a clear Call to Action (CTA) requesting specific supervisor sign-off or feedback on the prioritization strategy."
+        ],
+        "detailed_feedback": "The document serves as a high-level technical summary for a Final Year Project (FYP) named Presenova, using a full-stack architecture of React and FastAPI. While it succeeds in delivering a quick overview of feature counts and strategic positioning, its structure resembles a fragmented set of notes rather than a polished presentation deck or complete technical blueprint.\n\nFrom a structural standpoint, cramming the entire technical blueprint, feature list, master checklist, and supervisor summary into a single block of text reduces readability and impact. The presentation lacks standard navigation elements such as an introductory agenda slide, feature breakdown slides, and a formal closing call to action. Furthermore, while the document mentions that 9 features are missing, it fails to name or categorize them, leaving the reader with an incomplete picture of project scope.\n\nTo elevate this presentation to academic and professional standards, the content should be split into a clear multi-slide structure. Each major feature category requires a brief summary of backend/frontend implementation, progress status, and target evaluation metrics. Adding a detailed milestone timeline will ensure stakeholders understand how remaining features will be delivered prior to final evaluation.",
+        "improved_text": "Slide 1: Title & Project Overview\nSpeaker Notes: 'Good morning, everyone. Welcome to the technical plan presentation for Presenova\u2014an AI-powered presentation and communication coaching platform built on React and Python FastAPI. Today, I will walk you through our architectural blueprint, feature readiness, and research strategy.'\n\nSlide Content:\n\u2022 Project Title: Presenova \u2014 Technical Blueprint & FYP Plan\n\u2022 Tech Stack: Frontend (React.js) | Backend (Python / FastAPI)\n\u2022 Objective: Provide real-time 7Cs analysis and voice/text evaluation for presentation coaching.\n\n---\n\nSlide 2: Implementation Status & Master Checklist\nSpeaker Notes: 'To give a clear picture of our current progress, we have mapped out 23 total features required for full deployment. Currently, 13 features are fully functional, 1 is in partial development, and 9 are queued for our final development phase.'\n\nSlide Content:\n\u2022 Functional Status: 13 / 23 Features Fully Implemented (56% Complete)\n\u2022 In Progress: 1 Feature (Partial Implementation)\n\u2022 Remaining Pipeline: 9 Features Scheduled for Final Phase\n\u2022 Key Stack Components: FastAPI Async Endpoints, React State Management, WebSockets for Speech\n\n---\n\nSlide 3: Core Feature Architecture (Features 1 to 5)\nSpeaker Notes: 'Our foundational layer handles user workflows and core analyses. This includes secure authentication, document ingestion with 7Cs scoring, multi-draft tracking, speech processing, and an interactive AI chat assistant.'\n\nSlide Content:\n\u2022 Feature 1: Authentication & User Management (JWT / Role-Based Access)\n\u2022 Feature 2: Document Upload & 7C Written Analysis Engine (FastAPI + LLM Pipeline)\n\u2022 Feature 3: Multi-Draft Comparison & Iterative Improvement Engine\n\u2022 Feature 4: Speech Intelligence Lab (Audio Processing & Real-time Transcripts)\n\u2022 Feature 5: Interactive AI Chatbot (Q&A Contextual Assistant)\n\n---\n\nSlide 4: Advanced Features & Research Differentiators\nSpeaker Notes: 'What sets Presenova apart from existing tools are four key innovations: dual speech and document 7Cs feedback, multi-draft tracking, and expert validation framework. These pillars ensure high academic rigor and market value.'\n\nSlide Content:\n\u2022 Feature 6: Dashboard Analytics & Longitudinal Progress Tracking\n\u2022 Feature 7: Expert Validation Framework (Academic Contribution & Human-in-the-Loop Evaluation)\n\u2022 Feature 8: Personalization Suite\n  - 8A: Audience-Adaptive Scoring Engine\n  - 8B: Communication Style Profiler\n  - 8C: Gamification & Engagement Streaks\n\n---\n\nSlide 5: Strategic Next Steps & Approval Request\nSpeaker Notes: 'To prepare for final evaluation, our immediate priority is finalizing the Expert Validation Framework and Audience-Adaptive Scoring. I welcome your feedback and approval on this execution plan to move into testing.'\n\nSlide Content:\n\u2022 Priority Deliverables:\n  1. Integrate Expert Validation Framework for research benchmarks.\n  2. Deploy Audience-Adaptive Scoring for customized feedback.\n  3. Finalize Progress Tracking Dashboard for user evaluation.\n\u2022 Action Requested: Supervisor review and sign-off on the final development schedule.",
+        "original_text": "PRESENOVA \u2014 FYP Technical Plan\nComplete Feature Blueprint: Frontend + Backend | React + Python/FastAPI\nStatus:  Done    Partial    Missing     Priority:  HIGH    MED    LOW \nFeature 1: Authentication & User Management\nFeature 2: Document Upload & 7C Analysis (Core)\nFeature 3: Multi-Draft Comparison (Unique Feature)\nFeature 4: Speech Intelligence Lab (Voice Feature)\nFeature 5: AI Chat (Q&A Assistant)\nFeature 6: User Dashboard & Progress Analytics\nFeature 7: Expert Validation Framework (Research Contribution)\nFeature 8: Enhancement Features (Add for Final Evaluation)\n8A \u2014 Audience-Adaptive Scoring Engine\n8B \u2014 Communication Style Profiler\n8C \u2014 Gamification & Streaks\nMaster Checklist \u2014 What Exists vs What's Missing\nSummary for Supervisor\nCurrent Status: 13 of 23 planned features are fully implemented. 1 is partial. 9 are missing.\nUnique Features: 4 features exist in Presenova that NO competitor offers \u2014 7C on written docs, 7C on speech, multi-draft comparison, and % improvement tracking.\nPriority Additions: Expert Validation Framework + Audience-Adaptive Scoring + Progress Dashboard. These three additions make the project academically rigorous and commercially viable.",
+        "status": "success",
+        "analysis_timestamp": "2026-07-26T20:54:12.839033"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "d7dd98b4-00a7-4626-a0af-1a2a5815a520",
+      "created_at": "2026-07-26T20:54:12.868000",
+      "updated_at": "2026-07-26T20:54:12.868000",
+      "_id": "6a6673f4fa7393525c02ade3"
+    },
+    {
+      "id": "5f1481fd-daa7-41da-8906-646be06ec980",
+      "report_json": {
+        "status": "success",
+        "word_count": 65,
+        "speech_speed_wpm": 130.0,
+        "filler_words_count": 10,
+        "filler_words_percentage": 15.38,
+        "repetition_count": 0,
+        "duration_seconds": 30,
+        "actionable_feedback": [
+          "\u2705 Excellent speaking pace (130.0 WPM).",
+          "\u26a0\ufe0f Moderate filler word usage (10 instances). Reduce for improvement.",
+          "\u2705 Good word variety and no repetitions."
+        ],
+        "clarity_score": 90,
+        "transcript": "Hello everyone, today I want to talk about, you know, blockchain technology. Basically, blockchain is like a distributed ledger, and actually, it is very secure. Um, we can use it for smart contracts, and kind of, you know, supply chain tracking. But the main problem is scalability. Um, we need to find, you know, better consensus mechanisms. So, basically, that is my presentation. Any questions?",
+        "overall_score": 62,
+        "category_scores": {
+          "Structure": 55,
+          "Clarity": 65,
+          "Persuasion": 50,
+          "Content_Quality": 60,
+          "Call_to_Action": 45
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The main topic of blockchain technology is recognizable, but excessive filler words create noise that dilutes the message.",
+          "Concise": "The speaker overuses fluff words, resulting in a high filler rate of 15.4% that wastes time in a brief 30-second window.",
+          "Correct": "The underlying grammar is mostly acceptable, but informal filler phrases lower the professional standard.",
+          "Complete": "While key technical concepts are introduced, the presentation ends abruptly without thoroughly expanding on solutions or next steps.",
+          "Courteous": "The speech maintains a friendly greeting and closes with an invitation for questions, though the transition feels overly casual.",
+          "Concrete": "The speaker mentions specific applications like smart contracts and supply chain tracking, but lacks detailed examples or metrics.",
+          "Consistent": "The tone remains conversational throughout, though reliance on hedging phrases weakens the speaker's authoritative stance."
+        },
+        "seven_cs_scores": {
+          "Clear": 65,
+          "Concise": 45,
+          "Correct": 80,
+          "Complete": 55,
+          "Courteous": 85,
+          "Concrete": 50,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Maintained an optimal speaking pace of 130.0 WPM, ensuring technical terms like 'distributed ledger' were pronounced clearly.",
+          "Succinctly highlighted key blockchain features including security, smart contracts, supply chain tracking, and scalability challenges in 30 seconds.",
+          "Incorporated basic structural bookends with an initial greeting to the audience and a concluding invitation for questions."
+        ],
+        "recommendations": [
+          "Eliminate filler words such as 'you know', 'basically', 'kind of', and 'um', which accounted for 15.4% of total spoken words.",
+          "Replace the weak sign-off ('So, basically, that is my presentation') with a strong concluding summary that emphasizes the impact of resolving scalability.",
+          "Strengthen concreteness by providing a specific real-world application or brief statistic when referencing smart contracts and supply chain tracking."
+        ],
+        "detailed_feedback": "Your delivery pace of 130 WPM sits perfectly within the ideal 120-160 WPM range, allowing listeners to follow your thoughts easily. However, your delivery is severely impacted by verbal clutter. With 10 filler instances across just 30 seconds (a 15.4% filler rate), phrases like 'you know', 'basically', 'kind of', and 'um' detract from your authority as a subject matter expert.\n\nFrom a content and structural perspective, you correctly identify core blockchain principles\u2014such as distributed ledgers, smart contracts, supply chain tracking, and consensus scalability issues. However, the logical progression feels rushed and underdeveloped. Ending with 'So, basically, that is my presentation' diminishes your credibility and signals a lack of preparation.\n\nTo improve, practice replacing verbal fillers with deliberate silence. Pausing gives you time to construct your next thought while projecting confidence. Additionally, structure your pitch with a clear hook, detailed main points backed by concrete examples, and a strong, polished call to action or concluding statement.",
+        "improved_text": "Introduction\nHello everyone. Today, I am excited to discuss the transformative potential of blockchain technology.\n\nCore Applications & Security\nAt its core, a blockchain is a secure, distributed ledger that provides immutable record-keeping. Its primary applications include automating processes through smart contracts and enhancing transparency across global supply chain tracking.\n\nKey Challenge & Conclusion\nHowever, the central hurdle facing widespread enterprise adoption is scalability. To overcome this limitation, our industry must focus on developing faster and more efficient consensus mechanisms. Resolving this challenge will unlock unprecedented efficiency across business networks. Thank you for your time, and I look forward to your questions.",
+        "analysis_timestamp": "2026-07-27T01:18:17.752632"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": null,
+      "created_at": "2026-07-27T01:18:17.752000",
+      "updated_at": "2026-07-27T01:18:17.752000",
+      "_id": "6a66b1d98e5f7b73cbdf0fa5"
+    },
+    {
+      "id": "be517dad-d9bf-4e68-a4dd-e3086af21f7c",
+      "report_json": {
+        "overall_score": 80,
+        "document_name": "Fatima_Ahmed_Resume_Developer.docx",
+        "category_scores": {
+          "Structure": 82,
+          "Clarity": 85,
+          "Persuasion": 78,
+          "Content_Quality": 80,
+          "Call_to_Action": 65,
+          "Grammar_and_Syntax": 88,
+          "Accuracy": 85,
+          "Tone_Appropriateness": 90,
+          "Audience_Alignment": 82,
+          "Purpose_Fulfillment": 80
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The core message and qualifications are explicitly stated with clear technical terminology and functional focus areas. However, converting this content into a speech format requires stronger slide-to-slide transitional narrative.",
+          "Concise": "The text eliminates fluff and uses punchy, descriptive technical phrases throughout. Minor redundancy exists where tools and frameworks are repeated across summary, skills, and project descriptions.",
+          "Correct": "Grammar, contact details, and technical stack descriptions are accurate and adhere to industry standards. Minor alignment needed regarding academic completion timeline expectations.",
+          "Complete": "All critical technical resume sections\u2014skills, projects, certifications, and extracurriculars\u2014are presented thoroughly. It currently lacks a direct closing call to action suited for a oral slide delivery.",
+          "Courteous": "Tone is respectful, professional, and well-aligned with entry-level software engineering recruitment standards. The narrative maintains an objective and ambitious voice throughout.",
+          "Concrete": "The text references specific frameworks like MERN, React, and MongoDB along with practical projects. Concrete performance metrics, user counts, or measurable project outcomes would further strengthen impact.",
+          "Consistent": "Formatting, section headings, and bullet structures are consistent across major sections. Variations exist in how secondary projects are detailed compared to primary projects."
+        },
+        "seven_cs_scores": {
+          "Clear": 85,
+          "Concise": 88,
+          "Correct": 90,
+          "Complete": 82,
+          "Courteous": 92,
+          "Concrete": 75,
+          "Consistent": 80
+        },
+        "strengths": [
+          "Slide 1 / Summary: Clear and concise positioning as a MERN stack software engineering candidate with strong foundational principles.",
+          "Slide 3 / Projects: Clear link between full-stack technologies and practical application features like RESTful APIs and authentication.",
+          "Slide 4 / Volunteering: Strong emphasis on soft skills and community participation through Google Developer Groups and JTech."
+        ],
+        "recommendations": [
+          "Slide 2 / Technical Skills: Categorize programming languages by relative depth/proficiency to avoid listing too many distinct languages without context.",
+          "Slide 3 / Projects: Incorporate quantitative success metrics, such as database query optimization percentages or user interface load times.",
+          "Slide 5 / Call to Action: Add a dedicated slide establishing clear next steps, availability, and contact preferences for potential recruiters."
+        ],
+        "detailed_feedback": "The candidate profile presented in Fatima Ahmed's resume offers a solid foundation for a compelling technical presentation. The content logically progresses from personal summary and academic background to hands-on project work, technical skill sets, and extracurricular activities. The technical keywords\u2014including MERN stack, MVC architecture, Python, and RESTful APIs\u2014are relevant and aligned with industry expectations for entry-level full-stack roles.\n\nHowever, when evaluated as a presentation script or professional pitch, structural and persuasive weaknesses emerge. The text currently functions as a static CV rather than an engaging presentation. It lacks narrative storytelling, quantified achievements, and a decisive call to action at the end. Additionally, project descriptions focus heavily on tasks completed rather than business value delivered or problems solved.\n\nTo elevate this material into an impactful slide presentation, the content should be structured into distinct thematic slides with an engaging narrative arc. Each project should highlight the problem statement, technical solution, and measurable results. Finally, a robust concluding slide with a clear Call to Action will leave a memorable impression on recruiters and technical interviewers.",
+        "improved_text": "Slide 1: Title & Professional Summary\nHello everyone, my name is Fatima Ahmed, an aspiring Full-Stack Software Developer specializing in the MERN stack. Currently in my final semester at Jinnah University for Women, I focus on engineering scalable, end-to-end web applications. My expertise spans database architecture, RESTful API design, and responsive UI development using MongoDB, Express.js, React, and Node.js.\n\nSlide 2: Core Technical Competencies\nMy technical foundation encompasses multi-language proficiency across JavaScript, Python, Java, C#, and PHP. On the web development front, I build robust systems utilizing React, Node.js, and ASP.NET backed by relational and non-relational databases like MySQL, MongoDB, and Firebase. I strictly adhere to Object-Oriented Programming principles, MVC architecture, and modern software design patterns to ensure code maintainability and web security.\n\nSlide 3: Featured Projects & Practical Impact\nTo apply these concepts, I engineered a full-stack MERN E-Commerce Platform featuring dynamic product listings, secure user authentication, and real-time order management. Additionally, I built an MVC-based Library Management System to ensure scalable software design, and developed a modular Java Gym Management System utilizing core OOP principles. Beyond web development, I designed an SDG-aligned sustainability platform for plastic reduction.\n\nSlide 4: Leadership, Workshops & Extracurriculars\nContinuous learning and community involvement are central to my growth. I participated in advanced workshops on AI Prototyping with Google Gemini and Prompt Engineering. As a Project Presenter at JTech 2024 and Media Volunteer for Google Developer Groups on Campus (GDGoC), I actively communicated complex technical ideas to diverse audiences while managing digital outreach.\n\nSlide 5: Conclusion & Call to Action\nThank you for your time. I am actively seeking full-time opportunities as a Full-Stack Developer where I can contribute my engineering skills to innovative web solutions. Please reach out to me via email at fatimaahmedwarsi@gmail.com or connect with me on LinkedIn at linkedin.com/in/fatima-ahmed-0667241b7 to discuss how I can add value to your team.",
+        "original_text": "FATIMA AHMED\nAspiring Software Developer | Full-Stack (MERN)\nKarachi, Pakistan  |  +92-323-3216487  |  fatimaahmedwarsi@gmail.com  |  linkedin.com/in/fatima-ahmed-0667241b7\nSUMMARY\nSoftware Engineering student (8th Semester, BSSE, Jinnah University for Women, expected 2026) with hands-on full-stack development experience using the MERN stack (MongoDB, Express.js, React, Node.js). Skilled in building and shipping complete applications \u2014 from database design to RESTful APIs to responsive front-ends \u2014 with a strong foundation in OOP, MVC architecture, and software design patterns. Comfortable working across Python, Java, C++, C#, PHP, and JavaScript.\nEDUCATION\nBS in Software Engineering \u2014 Jinnah University for Women (JUW)\t2023 \u2013 Expected 2026\nKarachi, Pakistan | Currently in 8th Semester\nIntermediate (Pre-Medical) \u2014 Board of Intermediate Education Karachi (BIEK)\t2020 \u2013 2022\nCERTIFICATIONS\nScaleX Workshop \u2014 Hands-on MERN Stack development, 2025\nBuild with AI Workshop \u2014 Generative AI prototyping with Gemini, Google AI Studio & Vertex AI, 2025\nGoogle Prompting Essentials \u2014 5-step prompting framework (Task, Context, References, Evaluate, Iterate), 2025\nTECHNICAL SKILLS\nWeb Development: HTML, CSS, React, Node.js, Express.js, ASP.NET, MERN Stack\nProgramming Languages: Python, Java, C++, C#, PHP, JavaScript, SQL\nDatabases: MySQL, SQL Server, Firebase, MongoDB\nTools: VS Code, NetBeans, Git, Docker, Xampp\nCore Concepts: OOP, Data Structures & Algorithms, MVC Architecture, Software Design Patterns, Web Security\nSoft Skills: Communication, Teamwork, Problem-Solving, Adaptability\nPROJECTS\nE-commerce Platform \u2014 Full-Stack MERN\tApr \u2013 Jun 2025\nBuilt product listing, shopping cart, user authentication, and order management using MongoDB, Express.js, React, and Node.js\nImplemented RESTful APIs and integrated the database with the front-end for a seamless user experience\nLibrary Management System \u2014 MVC Architecture\tMay 2025\nDesigned the system following Model-View-Controller architecture for scalable, maintainable code\nGym Management System \u2014 Java (OOP)\tOct \u2013 Dec 2023\nApplied class design, inheritance, and encapsulation principles to build a modular management system\nAdditional Projects: Library Management System (SQL & Firebase, real-time data storage/retrieval) \u00b7 Minesweeper Game (Python, GUI + algorithmic logic) \u00b7 SDG Goal-Based Plastic-Free Initiative (sustainability venture, UN SDG 12 & 13)\nVOLUNTEERING & EXTRACURRICULAR\nProject Presenter \u2014 JTech 2024 (Digital Logic Design), JUW\t2024\nPresented a hardware-based project at the annual tech exhibition and explained its real-world application to attendees\nSocial Media Team Member (Event Volunteer) \u2014 JTech 2025, JUW\t2025\nManaged social media visibility and digital content distribution during the tech exhibition\nVideography & Media Volunteer \u2014 Google Developer Groups on Campus (GDGoC), JUW\t2024 \u2013 2025\nCaptured and edited event videos, highlights, and reels for tech workshops and speaker sessions\nLANGUAGES\nEnglish, Urdu",
+        "status": "success",
+        "analysis_timestamp": "2026-07-27T01:18:43.002915"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "e4f54fd5-180e-4680-a76d-edefb5b2c07d",
+      "created_at": "2026-07-27T01:18:43.011000",
+      "updated_at": "2026-07-27T01:18:43.011000",
+      "_id": "6a66b1f38e5f7b73cbdf0fa7"
+    },
+    {
+      "id": "1c1da853-ee20-4214-9a08-8472096b45e9",
+      "report_json": {
+        "status": "success",
+        "word_count": 65,
+        "speech_speed_wpm": 130.0,
+        "filler_words_count": 10,
+        "filler_words_percentage": 15.38,
+        "repetition_count": 0,
+        "duration_seconds": 30,
+        "actionable_feedback": [
+          "\u2705 Excellent speaking pace (130.0 WPM).",
+          "\u26a0\ufe0f Moderate filler word usage (10 instances). Reduce for improvement.",
+          "\u2705 Good word variety and no repetitions."
+        ],
+        "clarity_score": 90,
+        "transcript": "Hello everyone, today I want to talk about, you know, blockchain technology. Basically, blockchain is like a distributed ledger, and actually, it is very secure. Um, we can use it for smart contracts, and kind of, you know, supply chain tracking. But the main problem is scalability. Um, we need to find, you know, better consensus mechanisms. So, basically, that is my presentation. Any questions?",
+        "overall_score": 62,
+        "category_scores": {
+          "Structure": 58,
+          "Clarity": 65,
+          "Persuasion": 55,
+          "Content_Quality": 60,
+          "Call_to_Action": 45
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The main topic\u2014blockchain technology and its scalability issue\u2014is identifiable, though diluted by conversational crutches.",
+          "Concise": "The speech is excessively padded with filler phrases ('you know', 'basically', 'kind of'), resulting in a high filler rate of 15.4%.",
+          "Correct": "The grammar is generally acceptable, but hedging terms ('kind of', 'like') reduce technical accuracy and professionalism.",
+          "Complete": "While key technical concepts are mentioned, the explanation lacks depth due to the short 30-second duration.",
+          "Courteous": "The speaker opens politely with 'Hello everyone' and closes respectfully by inviting questions.",
+          "Concrete": "Specific terms like 'smart contracts' and 'consensus mechanisms' are used, but they lack concrete examples or data.",
+          "Consistent": "The speech maintains an informal tone throughout, though speed and clarity suffer slightly from conversational hesitations."
+        },
+        "seven_cs_scores": {
+          "Clear": 68,
+          "Concise": 48,
+          "Correct": 75,
+          "Complete": 55,
+          "Courteous": 85,
+          "Concrete": 62,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Maintains an optimal speaking pace of 130 WPM, which creates an easy-to-follow audio baseline.",
+          "Accurately integrates key domain terminology such as 'distributed ledger,' 'smart contracts,' and 'consensus mechanisms.'",
+          "Clearly identifies a core industry challenge by highlighting scalability as a major technical bottleneck."
+        ],
+        "recommendations": [
+          "Eliminate repetitive filler phrases ('you know,' 'basically,' 'kind of,' 'um') to immediately improve authority and conciseness.",
+          "Replace the weak sign-off ('So, basically, that is my presentation') with a strong concluding summary statement.",
+          "Elaborate on abstract terms by adding a concrete real-world example, such as how smart contracts improve logistics or finance."
+        ],
+        "detailed_feedback": "Your speaking pace of 130 WPM sits comfortably in the ideal range (120-160 WPM), providing a steady foundation for listener comprehension. However, the delivery is severely impacted by a high filler word percentage of 15.4%. Frequent reliance on 'you know,' 'basically,' 'kind of,' and vocalized pauses like 'um' undermines your credibility and detracts from the technical subject matter.\n\nFrom a content and structural perspective, you introduce important terms like 'distributed ledger,' 'smart contracts,' and 'consensus mechanisms,' but you do not elaborate on them. Hedging language like 'kind of' when referring to supply chain tracking makes your delivery sound uncertain rather than authoritative. Furthermore, the overall presentation lacks a well-defined structure, jumping rapidly from definitions to challenges without clear transitions.\n\nTo elevate this presentation, focus on replacing weak filler phrases with deliberate pauses. Instead of ending abruptly with 'So, basically, that is my presentation,' synthesize your main point into a concise concluding sentence before transitioning to the Q&A session. Incorporating a short, concrete example of how scalable consensus mechanisms solve real business problems will significantly increase the persuasive power of your message.",
+        "improved_text": "Introduction\nHello everyone. Today, I want to discuss the transformative potential and key challenges of blockchain technology.\n\nCore Concepts & Applications\nAt its foundation, blockchain operates as a secure, distributed ledger. This technology powers critical capabilities, such as automated smart contracts and end-to-end supply chain tracking.\n\nKey Challenge & Conclusion\nHowever, widespread adoption relies on solving the challenge of scalability. To overcome this, the industry must focus on developing faster and more efficient consensus mechanisms. Thank you, and I would now be happy to take any questions.",
+        "analysis_timestamp": "2026-07-27T01:20:54.873351"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": null,
+      "created_at": "2026-07-27T01:20:54.873000",
+      "updated_at": "2026-07-27T01:20:54.873000",
+      "_id": "6a66b2768e5f7b73cbdf0fa8"
+    },
+    {
+      "id": "9f09d411-2007-4e55-bf4f-6eaf32d378ed",
+      "report_json": {
+        "overall_score": 62,
+        "document_name": "Presenova_FYP_Plan.docx",
+        "category_scores": {
+          "Structure": 60,
+          "Clarity": 75,
+          "Persuasion": 65,
+          "Content_Quality": 50,
+          "Call_to_Action": 55,
+          "Grammar_and_Syntax": 85,
+          "Accuracy": 80,
+          "Tone_Appropriateness": 80,
+          "Audience_Alignment": 65,
+          "Purpose_Fulfillment": 60
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The core purpose and status summary are understandable, but the main feature list lacks description and functional clarity.",
+          "Concise": "The document is brief and avoids unnecessary wordiness, though it borderlines on being overly terse at the expense of necessary context.",
+          "Correct": "The grammar, terminology, and tech stack references (React, FastAPI) are correct with no major spelling errors.",
+          "Complete": "The document is incomplete as a technical plan presentation because features 1 through 8 display only title placeholders without operational details.",
+          "Courteous": "The tone is professional, direct, and respectful, fitting an academic or professional project progress update.",
+          "Concrete": "The inclusion of exact stats (13 of 23 features complete) provides good specificity, but the feature specifications remain abstract.",
+          "Consistent": "Status tags and header conventions are used systematically, though the document shifts abruptly from a feature list to a supervisor summary."
+        },
+        "seven_cs_scores": {
+          "Clear": 75,
+          "Concise": 80,
+          "Correct": 85,
+          "Complete": 45,
+          "Courteous": 80,
+          "Concrete": 60,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Slide/Section 'Summary for Supervisor': Excellent quantitative snapshot (13 of 23 features implemented) that immediately communicates project velocity.",
+          "Slide/Section 'Unique Features': Strong value proposition highlighting 4 key market differentiators against competitors.",
+          "Slide/Section 'Priority Additions': Clear strategic identification of high-impact features (Expert Validation, Audience-Adaptive Scoring, Progress Dashboard) for academic and commercial success."
+        ],
+        "recommendations": [
+          "Expand Feature Blueprint (Features 1-8): Provide 2-3 detailed bullet points per feature explaining frontend/backend architecture rather than bare titles.",
+          "Establish Clear Slide Structure: Transform the flat bullet list into distinct presentation slides with standard headers, visuals, and presenter cues.",
+          "Strengthen Call to Action: Conclude with a dedicated slide outlining concrete technical milestones, resource requirements, and approval steps for the supervisor."
+        ],
+        "detailed_feedback": "The document serves as a high-level technical status summary for the 'Presenova' Final Year Project, effectively highlighting key technical stacks (React + Python/FastAPI) and identifying critical metrics. However, as a presentation or technical plan, it suffers from severe structural and depth deficiencies. Features 1 through 8 are presented as bare headings without explanatory text, backend/frontend data flows, or technical implementation notes. This leaves the supervisor with an incomplete picture of the actual system architecture.\n\nFurthermore, the presentation flow lacks proper formatting transitions. The text jumps from a high-level feature list into a master checklist mention and then into a supervisor summary without clear slide boundaries or visual cues. To make this an effective academic defense or technical project review, each feature block must be detailed, supported by concrete metrics, and organized into dedicated slides with a clear call to action guiding the supervisor's evaluation.",
+        "improved_text": "SLIDE 1: Title & Executive Overview\nHeader: PRESENOVA \u2014 FYP Technical Architecture & Implementation Plan\nSubtitle: Full-Stack AI Communication Platform (React + Python/FastAPI)\n\nPresenter Speech Script:\n'Good morning, everyone. Today I am presenting the complete technical blueprint and current implementation status for Presenova\u2014an AI-driven presentation and communication intelligence platform. Our stack leverages React for an adaptive frontend interface and Python FastAPI to drive our core asynchronous NLP engines.'",
+        "original_text": "PRESENOVA \u2014 FYP Technical Plan\nComplete Feature Blueprint: Frontend + Backend | React + Python/FastAPI\nStatus:  Done    Partial    Missing     Priority:  HIGH    MED    LOW \nFeature 1: Authentication & User Management\nFeature 2: Document Upload & 7C Analysis (Core)\nFeature 3: Multi-Draft Comparison (Unique Feature)\nFeature 4: Speech Intelligence Lab (Voice Feature)\nFeature 5: AI Chat (Q&A Assistant)\nFeature 6: User Dashboard & Progress Analytics\nFeature 7: Expert Validation Framework (Research Contribution)\nFeature 8: Enhancement Features (Add for Final Evaluation)\n8A \u2014 Audience-Adaptive Scoring Engine\n8B \u2014 Communication Style Profiler\n8C \u2014 Gamification & Streaks\nMaster Checklist \u2014 What Exists vs What's Missing\nSummary for Supervisor\nCurrent Status: 13 of 23 planned features are fully implemented. 1 is partial. 9 are missing.\nUnique Features: 4 features exist in Presenova that NO competitor offers \u2014 7C on written docs, 7C on speech, multi-draft comparison, and % improvement tracking.\nPriority Additions: Expert Validation Framework + Audience-Adaptive Scoring + Progress Dashboard. These three additions make the project academically rigorous and commercially viable.",
+        "status": "success",
+        "analysis_timestamp": "2026-07-27T01:21:06.617527"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "87b2ea2f-3fb3-445a-9d1a-287c4422fbf8",
+      "created_at": "2026-07-27T01:21:06.626000",
+      "updated_at": "2026-07-27T01:21:06.626000",
+      "_id": "6a66b2828e5f7b73cbdf0faa"
+    },
+    {
+      "id": "ed4e6723-ebab-4805-8b82-8da7f54d4c5c",
+      "report_json": {
+        "status": "success",
+        "word_count": 1,
+        "speech_speed_wpm": 60.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 1,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too slowly (60.0 WPM). Try to maintain 120-160 WPM.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 85,
+        "transcript": " Hello.",
+        "overall_score": 35,
+        "category_scores": {
+          "Structure": 10,
+          "Clarity": 90,
+          "Persuasion": 10,
+          "Content_Quality": 15,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The word spoken is perfectly clear and easy to understand.",
+          "Concise": "It is extremely brief, though a single-word delivery in one second places the pace at 60 WPM.",
+          "Correct": "The greeting is grammatically correct and appropriate for opening a conversation.",
+          "Complete": "The audio consists solely of a single word greeting, leaving the speech entirely incomplete.",
+          "Courteous": "The opening word 'Hello' is polite, courteous, and professional.",
+          "Concrete": "There are no specific details, data points, or substance provided in a one-word transcript.",
+          "Consistent": "The tone is polite, but the sample is too short to establish a broader consistent narrative."
+        },
+        "seven_cs_scores": {
+          "Clear": 90,
+          "Concise": 85,
+          "Correct": 95,
+          "Complete": 10,
+          "Courteous": 90,
+          "Concrete": 10,
+          "Consistent": 50
+        },
+        "strengths": [
+          "Used a friendly and polite initial greeting ('Hello.') to initiate the interaction.",
+          "Zero filler words or speech hesitations were detected during delivery.",
+          "Clear articulation with standard pronunciation for the single word spoken."
+        ],
+        "recommendations": [
+          "Expand the introductory greeting into a complete opening statement that introduces yourself and your presentation topic.",
+          "Increase speaking duration and word volume to allow for a proper assessment of pacing, tone, and rhetorical structure.",
+          "Include a clear call to action or concluding summary to complete the communication loop with your audience."
+        ],
+        "detailed_feedback": "Your audio sample consisted of a single word, 'Hello,' spoken over a duration of one second. While the greeting itself is clear, articulate, and completely free of filler words or grammatical errors, it does not constitute a complete speech or presentation. As a result, structural elements such as an introduction, body narrative, persuasion levers, and call to action are entirely absent.\n\nFrom a vocal pacing standpoint, delivering one word in one second equates to a speaking pace of 60.0 WPM, which falls well below the optimal conversational presentation range of 120\u2013160 WPM. However, pace metrics on single-word utterances are naturally skewed. In future recordings, aim to deliver at least 30 to 60 seconds of continuous speech to allow for a meaningful analysis of your rhythm and vocal variety.\n\nTo build a compelling presentation, follow up your initial greeting with a brief self-introduction, an outline of what you will discuss, and explicit main points supported by concrete details. Ending with a clear summary or next steps will ensure your speech achieves high marks across all seven Cs of communication.",
+        "improved_text": "### Introduction\nHello everyone, and welcome to today's presentation. My name is [Your Name], and I am excited to share our latest updates with you.\n\n### Key Message\nToday, we will focus on three key strategic goals that will drive our progress this quarter: enhancing overall communication, streamlining our operations, and maximizing value for our stakeholders.\n\n### Conclusion & Call to Action\nThank you for your time and attention today. Let us work together to implement these initiatives\u2014please feel free to reach out with any questions as we move forward.",
+        "analysis_timestamp": "2026-07-27T02:27:40.641898"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "9060d46e-410b-49a1-b88c-9c580aebade6",
+      "created_at": "2026-07-27T02:27:40.665000",
+      "updated_at": "2026-07-27T02:27:40.665000",
+      "_id": "6a66c21cebcb688ce3d6642c"
+    },
+    {
+      "id": "2f3f08e7-45e4-42a6-a2f7-196397d58b32",
+      "report_json": {
+        "status": "success",
+        "word_count": 11,
+        "speech_speed_wpm": 220.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 3,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too fast (220.0 WPM). Aim for 120-160 WPM for better clarity.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 80,
+        "transcript": " I'm going to take one piece out of the cheese cake.",
+        "overall_score": 42,
+        "category_scores": {
+          "Structure": 15,
+          "Clarity": 55,
+          "Persuasion": 20,
+          "Content_Quality": 25,
+          "Call_to_Action": 10
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The core intent is understandable, but awkward phrasing obscures natural expression.",
+          "Concise": "While extremely short with zero filler words, the delivery speed of 220 WPM is far too rushed.",
+          "Correct": "The phrase 'piece out of the cheese cake' contains minor grammatical awkwardness and a compound word error ('cheesecake').",
+          "Complete": "The speech is entirely incomplete as a presentation, offering only a single isolated sentence without context.",
+          "Courteous": "The tone is neutral and direct, though it lacks professional Polish or audience engagement.",
+          "Concrete": "It specifies a tangible action and object, giving it a basic degree of concreteness.",
+          "Consistent": "The brevity makes consistency difficult to measure, though the rushed pacing was maintained throughout."
+        },
+        "seven_cs_scores": {
+          "Clear": 60,
+          "Concise": 50,
+          "Correct": 55,
+          "Complete": 15,
+          "Courteous": 70,
+          "Concrete": 65,
+          "Consistent": 50
+        },
+        "strengths": [
+          "Zero filler words or vocal hesitations were used during the 3-second recording.",
+          "The speaker clearly identifies a specific object and immediate action ('take one piece').",
+          "Direct and concise phrasing avoids unnecessary preamble or filler phrases."
+        ],
+        "recommendations": [
+          "Reduce speaking pace significantly from 220 WPM to the ideal range of 120-160 WPM to improve clarity and weight.",
+          "Refine word choice from 'take one piece out of the cheese cake' to the more natural phrasing 'take a slice of cheesecake'.",
+          "Expand the statement into a structured presentation format with an introduction, context, and clear concluding takeaway."
+        ],
+        "detailed_feedback": "Your 3-second statement was delivered at 220 WPM, which significantly exceeds the recommended public speaking speed of 120 to 160 WPM. Speaking at this high velocity can make your audience feel rushed and makes it difficult for them to absorb your message effectively. On a positive note, your speech contained zero filler words or repetitions, demonstrating clean vocalization despite the excessive pace.\n\nFrom a grammatical and stylistic standpoint, the phrase 'take one piece out of the cheese cake' sounds unnatural. The standard term is 'a slice of cheesecake' (written as a single word). Additionally, as a presentation segment, this transcript lacks essential structural elements such as an introduction, supporting context, and a call to action or closing remark.\n\nTo elevate your presentation quality, slow down your vocal cadence, focus on precise vocabulary, and frame your ideas within a clear narrative structure. Expanding on why you are taking the action and addressing your audience directly will make your message far more persuasive and complete.",
+        "improved_text": "### Introduction\nGood afternoon, everyone. I would like to briefly share a quick update regarding our dessert selection today.\n\n### Main Statement\nI am going to serve myself a fresh slice of cheesecake from the platter.\n\n### Call to Action\nPlease feel free to help yourselves to the remaining slices while they are available.",
+        "analysis_timestamp": "2026-07-27T02:33:15.611855"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "5c04173a-063a-4a20-ab91-53245e15685d",
+      "created_at": "2026-07-27T02:33:15.641000",
+      "updated_at": "2026-07-27T02:33:15.641000",
+      "_id": "6a66c36bebcb688ce3d6642e"
+    },
+    {
+      "id": "9b5510dd-5814-4e23-9119-1776363ed8b2",
+      "report_json": {
+        "status": "success",
+        "word_count": 1,
+        "speech_speed_wpm": 20.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 3,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too slowly (20.0 WPM). Try to maintain 120-160 WPM.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 85,
+        "transcript": " .",
+        "overall_score": 15,
+        "category_scores": {
+          "Structure": 10,
+          "Clarity": 10,
+          "Persuasion": 10,
+          "Content_Quality": 10,
+          "Call_to_Action": 10
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The speech lacks any vocal message or clear words, making it impossible to convey a distinct message to the audience.",
+          "Concise": "Although extremely brief at three seconds, the transcript lacks substantive speech rather than being intentionally concise.",
+          "Correct": "No spoken words or grammatical structures were present to evaluate for linguistic accuracy or correct usage.",
+          "Complete": "The presentation is entirely incomplete as no key points, context, or conclusions were delivered during the timeframe.",
+          "Courteous": "A courteous professional tone could not be established due to the total absence of spoken communication.",
+          "Concrete": "The transcript contains no specific details, data points, or illustrative examples to support a main idea.",
+          "Consistent": "Consistency in delivery, tone, and pacing could not be maintained given the lack of verbal output."
+        },
+        "seven_cs_scores": {
+          "Clear": 10,
+          "Concise": 30,
+          "Correct": 10,
+          "Complete": 0,
+          "Courteous": 50,
+          "Concrete": 0,
+          "Consistent": 10
+        },
+        "strengths": [
+          "The 3-second recording was free of vocalized filler words such as 'um' or 'ah'.",
+          "No repetitive words or verbal stumbles were captured in the audio window.",
+          "The recording started promptly without extended background noise before speaking."
+        ],
+        "recommendations": [
+          "Verify that your audio input device is properly connected and capturing your voice before beginning the speech.",
+          "Develop a structured script or outline containing an introduction, body paragraphs, and a conclusion prior to recording.",
+          "Maintain a standard conversational speaking pace between 120 and 160 WPM across a complete delivery."
+        ],
+        "detailed_feedback": "The primary issue with this submission is the complete absence of audible speech or meaningful transcript content. With a calculated speaking pace of only 20.0 WPM over a 3-second duration, the recording captured no actionable information, making it impossible to evaluate persuasive delivery, structural flow, or core messaging.\n\nTo improve future speaking evaluations, ensure your microphone levels are correctly calibrated and that you begin speaking immediately after recording starts. Prepare a clear message that spans at least 30 to 60 seconds to allow for a comprehensive analysis of your vocal tone, articulation, and pacing.\n\nFor effective public speaking, aim to structure your talk around a strong opening hook, key supporting points backed by concrete details, and a clear call to action. Practicing with a target speed of 120-160 WPM will ensure your voice sounds natural, engaging, and professional.",
+        "improved_text": "### Introduction\nHello everyone, thank you for taking the time to listen today. I am excited to present an overview of our project goals and upcoming milestones.\n\n### Key Objectives\nFirst, our primary objective is to enhance overall communication and efficiency across all team operations. Second, we aim to implement clear tracking metrics so every team member remains aligned with our core strategy.\n\n### Conclusion\nThank you for your attention. Please review the shared documentation and share your feedback before our next scheduled meeting.",
+        "analysis_timestamp": "2026-07-27T02:35:13.526425"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "f2692865-bf4f-4060-aff5-7960a1d4c93e",
+      "created_at": "2026-07-27T02:35:13.552000",
+      "updated_at": "2026-07-27T02:35:13.552000",
+      "_id": "6a66c3e1f624b27748f7ff73"
+    },
+    {
+      "id": "0a31a1a9-a138-4256-a3fa-14a7570ff6b6",
+      "report_json": {
+        "status": "success",
+        "word_count": 5,
+        "speech_speed_wpm": 75.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 4,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too slowly (75.0 WPM). Try to maintain 120-160 WPM.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 85,
+        "transcript": " Hello, can you hear me?",
+        "overall_score": 45,
+        "category_scores": {
+          "Structure": 20,
+          "Clarity": 80,
+          "Persuasion": 15,
+          "Content_Quality": 20,
+          "Call_to_Action": 30
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The utterance is simple and easy to understand, though it functions only as a technical check rather than a substantive message.",
+          "Concise": "The phrase is extremely brief and free of filler words, though the speaking pace of 75 WPM is overly slow.",
+          "Correct": "Grammatically accurate and properly phrased for an informal mic check.",
+          "Complete": "The statement lacks presentation content, serving only to test audio connectivity rather than delivering a complete message.",
+          "Courteous": "The greeting 'Hello' is polite and professional for an initial interaction.",
+          "Concrete": "The phrase lacks specific details, data, or presentation substance.",
+          "Consistent": "The short phrase maintains a uniform, polite tone throughout its brief 4-second duration."
+        },
+        "seven_cs_scores": {
+          "Clear": 85,
+          "Concise": 85,
+          "Correct": 95,
+          "Complete": 20,
+          "Courteous": 85,
+          "Concrete": 25,
+          "Consistent": 80
+        },
+        "strengths": [
+          "Delivered without filler words or vocal stumbles.",
+          "Grammatically correct and polite opening phrase ('Hello, can you hear me?').",
+          "Clear vocal projection that establishes basic line testing effectively."
+        ],
+        "recommendations": [
+          "Conduct technical audio checks before the presentation begins to avoid using audience time for logistics.",
+          "Transition immediately into a strong hook or formal welcome instead of asking for audio confirmation.",
+          "Increase speaking pace to the optimal 120-160 WPM range to maintain audience energy and focus."
+        ],
+        "detailed_feedback": "The provided audio transcript, 'Hello, can you hear me?', represents a brief technical check rather than a structured speech. While the query is grammatically flawless and completely free of filler words or repetitions, relying on audio checks at the start of a presentation can weaken your authority and dynamic opening presence.\n\nAt 75 WPM over a 4-second duration, the delivery speed falls below the ideal conversational range of 120-160 WPM. This slow pace, coupled with the lack of actual content, creates a hesitant start. Audiences form quick first impressions, so starting with technical logistics rather than a strong opening hook can reduce audience engagement immediately.\n\nTo elevate your delivery, complete all sound checks prior to the start time with a technician or host. When you take the stage or turn on your microphone, launch directly into a confident greeting, introduce your topic clearly, and state the value your presentation provides.",
+        "improved_text": "# Welcome and Introduction\n\n## Opening Hook\nGood day, everyone, and welcome. Thank you for joining today's session.\n\n## Overview\nI am thrilled to share our latest insights with you today. Over the next few minutes, we will explore key strategies and practical solutions designed to help you achieve your goals.",
+        "analysis_timestamp": "2026-07-27T02:37:04.782654"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "55661d95-e6d6-4042-ac39-0bf93e3ca9ac",
+      "created_at": "2026-07-27T02:37:04.805000",
+      "updated_at": "2026-07-27T02:37:04.805000",
+      "_id": "6a66c450f624b27748f7ff75"
+    },
+    {
+      "id": "57fd14c8-a0e4-4c39-94e1-fcb12ea73b7a",
+      "report_json": {
+        "status": "success",
+        "word_count": 15,
+        "speech_speed_wpm": 50.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 18,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too slowly (50.0 WPM). Try to maintain 120-160 WPM.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 85,
+        "transcript": " MongoDB connection failed. Failing backend memory mongo mocks. The resolution lifetime expired after 23 seconds.",
+        "overall_score": 45,
+        "category_scores": {
+          "Structure": 25,
+          "Clarity": 60,
+          "Persuasion": 20,
+          "Content_Quality": 45,
+          "Call_to_Action": 10
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The technical failure is identified, but the message lacks surrounding context regarding why it matters or what system is affected.",
+          "Concise": "While brief and free of filler words, the delivery is severely hampered by an unnaturally slow speaking rate.",
+          "Correct": "The speech relies on fragmented log-style phrases such as 'Failing backend memory mongo mocks' rather than proper grammatical sentence structures.",
+          "Complete": "The update is incomplete as a speech; it lacks an introduction, root-cause explanation, and next steps for resolution.",
+          "Courteous": "The tone is neutral and objective, suitable for a technical status report, though lacking active professional engagement.",
+          "Concrete": "The transcript includes specific technical details, naming MongoDB, memory mocks, and the exact timeout threshold of 23 seconds.",
+          "Consistent": "The delivery remains monotone and technical throughout, though the extremely sluggish pace creates inconsistencies with standard spoken cadence."
+        },
+        "seven_cs_scores": {
+          "Clear": 65,
+          "Concise": 80,
+          "Correct": 55,
+          "Complete": 30,
+          "Courteous": 70,
+          "Concrete": 75,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Specific technical details are clearly stated, explicitly mentioning 'MongoDB' and the '23 seconds' resolution lifetime.",
+          "Zero filler words or speech hesitations were detected during the recording.",
+          "Direct and succinct delivery without unnecessary fluff or rambling."
+        ],
+        "recommendations": [
+          "Increase speaking pace from 50 WPM to the standard conversational rate of 120-160 WPM to prevent artificial pauses.",
+          "Convert telegraphic fragments like 'Failing backend memory mongo mocks' into full grammatical sentences.",
+          "Add a clear conclusion and call to action detailing the immediate steps being taken to restore the database connection."
+        ],
+        "detailed_feedback": "The delivered audio resembles a system log output read aloud rather than a structured verbal update. Speaking at 50 WPM over 18 seconds for only 15 words creates an unnaturally sluggish pace with prolonged pauses between words. To keep an audience engaged, aim for a natural conversational range of 120 to 160 WPM, which would allow this information to be delivered dynamically in under 5 seconds or expanded into a full 18-second report with complete context.\n\nFrom a structural and grammatical standpoint, the statement relies on fragmented phrasing like 'Failing backend memory mongo mocks.' While recognizable in technical contexts, it lacks standard sentence structure and impact. Additionally, there is no formal opening to set the stage or a concluding call to action outlining the remediation path. Presentations\u2014even brief status updates\u2014require a clear problem statement, operational impact, and proposed resolution.\n\nTo improve future technical updates, frame the error report using a narrative structure. State what broke, explain the impact on users or infrastructure, and present the immediate action plan. Elevating log data into a complete verbal briefing transforms raw technical output into actionable team communication.",
+        "improved_text": "### Technical Incident Status Update\n\n**Introduction**\nGood morning team. I want to provide a quick update regarding a backend database error detected during our automated testing run.\n\n**Problem Statement**\nOur primary MongoDB connection failed, causing a fallback to our backend memory mongo mocks. Unfortunately, the connection resolution lifetime expired after reaching its 23-second timeout limit.\n\n**Impact & Next Steps**\nAs a result, database dependent integration tests are currently failing. The engineering team is currently investigating the database credentials and network routing. We expect to have the connection restored and tests passing within the next thirty minutes. I will keep everyone updated.",
+        "analysis_timestamp": "2026-07-27T02:41:15.457592"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "6d08a1c2-cbac-4723-a667-7ae47a5ed584",
+      "created_at": "2026-07-27T02:41:15.489000",
+      "updated_at": "2026-07-27T02:41:15.489000",
+      "_id": "6a66c54bce6c408684511681"
+    },
+    {
+      "id": "94354d69-0635-43b3-a6ea-b3b5e61d9169",
+      "report_json": {
+        "overall_score": 58,
+        "document_name": "Presenova_FYP_Plan.docx",
+        "category_scores": {
+          "Structure": 50,
+          "Clarity": 65,
+          "Persuasion": 58,
+          "Content_Quality": 45,
+          "Call_to_Action": 40,
+          "Grammar_and_Syntax": 75,
+          "Accuracy": 80,
+          "Tone_Appropriateness": 75,
+          "Audience_Alignment": 60,
+          "Purpose_Fulfillment": 52
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The high-level technical scope and competitive advantages are clearly stated, though feature definitions lack detail.",
+          "Concise": "The document is extremely brief, but borders on being incomplete due to missing feature breakdowns.",
+          "Correct": "Grammar and technical terms are accurate, but structural fragmentation reduces formal correctness.",
+          "Complete": "The presentation is incomplete, as the Master Checklist header lacks content and individual features lack status tags.",
+          "Courteous": "The tone is professional and respectful, making it appropriate for academic supervisory updates.",
+          "Concrete": "Metrics like 13 of 23 features completed provide good grounding, but specific feature capabilities need concrete details.",
+          "Consistent": "The document defined a status and priority key at the top but failed to consistently apply it across features."
+        },
+        "seven_cs_scores": {
+          "Clear": 65,
+          "Concise": 80,
+          "Correct": 75,
+          "Complete": 40,
+          "Courteous": 85,
+          "Concrete": 60,
+          "Consistent": 55
+        },
+        "strengths": [
+          "Slide 1 / Title Header: Establishes a clear technical scope and architecture baseline using React and Python/FastAPI.",
+          "Summary for Supervisor Section: Strong competitive analysis clearly identifying four unique market differentiators.",
+          "Summary for Supervisor Section: Provides clear quantitative metrics (13 of 23 features implemented) for quick status assessment."
+        ],
+        "recommendations": [
+          "Feature Blueprint Section: Apply the defined Status (Done/Partial/Missing) and Priority (HIGH/MED/LOW) tags to every individual feature.",
+          "Master Checklist Section: Populate the empty Master Checklist section with a structured comparison table or categorized bullet points.",
+          "Concluding Slide: Add an explicit call-to-action slide detailing supervisor review milestones, timeline expectations, and next steps."
+        ],
+        "detailed_feedback": "The presented document serves as a functional outline for the 'Presenova' Final Year Project technical plan, but it lacks the depth and polished structure required for an effective academic presentation deck. While the overall stack (React + Python/FastAPI) and primary goals are effectively identified, the core feature list consists only of bare titles without descriptive context, status tags, or execution details. Crucially, the 'Master Checklist' heading contains no content, leaving the supervisor to guess the state of individual deliverables.\n\nAdditionally, the document's structure buries its most compelling points at the bottom. The unique value propositions\u2014such as 7C analysis on speech and multi-draft tracking\u2014and quantitative progress metrics (13 of 23 features complete) are placed in a closing summary rather than driving the narrative forward. The defined status and priority key at the top of the document is left completely unutilized in the main feature list.\n\nTo transform this into an academic-grade presentation, each feature should be mapped to its implementation status, technical stack components, and core user benefit. Structuring the presentation into logical slides\u2014Introduction & Architecture, Implemented Core Features, Competitive Differentiators, and Implementation Roadmap\u2014will drastically improve engagement, clarity, and supervisory alignment.",
+        "improved_text": "Slide 1: Title & Architectural Blueprint\nHeading: PRESENOVA \u2014 Final Year Project Technical Plan\nSubtitle: Enterprise-Grade Communication Intelligence Platform\nTech Stack: Frontend: React | Backend: Python / FastAPI\nSpeech Script:\n\"Good morning, everyone. Today I am presenting the technical plan for Presenova, an AI-powered communication intelligence platform designed to elevate presentation skills and document drafting. Built on a robust React frontend and a high-performance Python/FastAPI backend, Presenova bridges automated feedback with actionable, real-time analytics.\"\n\nSlide 2: Current Status & Implementation Progress\nHeading: Executive Project Overview\n- Overall Progress: 13 of 23 Planned Features Fully Implemented (56% Complete)\n- In Progress: 1 Feature (Partial Implementation)\n- Outstanding: 9 Features Planned for Final Evaluation\nSpeech Script:\n\"To give an immediate overview of our project velocity: we have fully implemented 13 out of 23 planned features. One feature is partially integrated, and 9 remaining features are scheduled for development in our final sprint. Our architecture is stable, with core processing pipelines operational.\"\n\nSlide 3: Core Feature Architecture & Status\nHeading: Feature Blueprint & Implementation Status\n- Feature 1: Authentication & User Management [Status: DONE | Priority: HIGH]\n  \u2022 Secure JWT-based authentication, user roles, and profile settings.\n- Feature 2: Document Upload & 7C Analysis Engine [Status: DONE | Priority: HIGH]\n  \u2022 Automated evaluation across Clear, Concise, Correct, Complete, Courteous, Concrete, and Consistent parameters.\n- Feature 3: Multi-Draft Comparison [Status: DONE | Priority: HIGH]\n  \u2022 Side-by-side progression tracking showing quality improvements over time.\n- Feature 4: Speech Intelligence Lab [Status: PARTIAL | Priority: HIGH]\n  \u2022 Real-time speech-to-text analysis for vocal delivery, tone, and pacing feedback.\nSpeech Script:\n\"Looking at our primary modules, our core engine\u2014comprising user authentication, document 7C analysis, and multi-draft tracking\u2014is fully functional. The Speech Intelligence Lab is currently undergoing final voice analytics tuning to complete speech evaluation capabilities.\"\n\nSlide 4: Advanced Modules & Competitive Edge\nHeading: Secondary Features & Unique Value Proposition\n- Feature 5: AI Chat Q&A Assistant [Status: DONE | Priority: MED]\n- Feature 6: User Dashboard & Progress Analytics [Status: DONE | Priority: HIGH]\n- Feature 7: Expert Validation Framework [Status: MISSING | Priority: HIGH] (Academic Research Focus)\nKey Differentiators:\n1. Written Document 7C Scoring\n2. Real-Time Speech 7C Scoring\n3. Multi-Draft Automated Comparison\n4. Quantitative Percentage Improvement Tracking\nSpeech Script:\n\"What sets Presenova apart from existing tools is our holistic approach. Presenova offers four key capabilities unavailable in rival solutions: dual 7C scoring for both written text and spoken delivery, automated multi-draft comparison, and quantitative skill progression tracking over time.\"\n\nSlide 5: Priority Additions & Next Steps\nHeading: Road to Final Evaluation & Supervisor Sign-off\n- Feature 8A: Audience-Adaptive Scoring Engine [Priority: HIGH]\n- Feature 8B: Communication Style Profiler [Priority: MED]\n- Feature 8C: Gamification & Consistency Streaks [Priority: LOW]\nNext Steps for Supervisor Approval:\n1. Finalize the Expert Validation Framework methodology.\n2. Complete integrations for Audience-Adaptive Scoring.\n3. Conduct preliminary user testing and collect validation data.\nSpeech Script:\n\"In our final phase, we are prioritizing the Expert Validation Framework and Audience-Adaptive Scoring Engine. These additions ensure academic rigor and commercial viability. I invite your feedback on this roadmap and request approval to proceed with our final validation phase.\"",
+        "original_text": "PRESENOVA \u2014 FYP Technical Plan\nComplete Feature Blueprint: Frontend + Backend | React + Python/FastAPI\nStatus:  Done    Partial    Missing     Priority:  HIGH    MED    LOW \nFeature 1: Authentication & User Management\nFeature 2: Document Upload & 7C Analysis (Core)\nFeature 3: Multi-Draft Comparison (Unique Feature)\nFeature 4: Speech Intelligence Lab (Voice Feature)\nFeature 5: AI Chat (Q&A Assistant)\nFeature 6: User Dashboard & Progress Analytics\nFeature 7: Expert Validation Framework (Research Contribution)\nFeature 8: Enhancement Features (Add for Final Evaluation)\n8A \u2014 Audience-Adaptive Scoring Engine\n8B \u2014 Communication Style Profiler\n8C \u2014 Gamification & Streaks\nMaster Checklist \u2014 What Exists vs What's Missing\nSummary for Supervisor\nCurrent Status: 13 of 23 planned features are fully implemented. 1 is partial. 9 are missing.\nUnique Features: 4 features exist in Presenova that NO competitor offers \u2014 7C on written docs, 7C on speech, multi-draft comparison, and % improvement tracking.\nPriority Additions: Expert Validation Framework + Audience-Adaptive Scoring + Progress Dashboard. These three additions make the project academically rigorous and commercially viable.",
+        "status": "success",
+        "analysis_timestamp": "2026-07-28T06:54:45.789949"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "dddacf91-2622-41bb-9190-ce296a5086f7",
+      "created_at": "2026-07-28T06:54:45.853000",
+      "updated_at": "2026-07-28T06:54:45.853000",
+      "_id": "6a6852355b233312fce4a168"
+    },
+    {
+      "id": "91e0125e-14de-4167-943d-143c42214ada",
+      "report_json": {
+        "overall_score": 67,
+        "document_name": "Presenova_FYP_Plan.docx",
+        "category_scores": {
+          "Structure": 62,
+          "Clarity": 72,
+          "Persuasion": 68,
+          "Content_Quality": 55,
+          "Call_to_Action": 58,
+          "Grammar_and_Syntax": 88,
+          "Accuracy": 78,
+          "Tone_Appropriateness": 85,
+          "Audience_Alignment": 80,
+          "Purpose_Fulfillment": 64
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The high-level goals and project differentiators are communicated clearly, though feature execution details remain somewhat abstract.",
+          "Concise": "The document avoids unnecessary filler words, but sacrifices essential technical details and context in pursuit of brevity.",
+          "Correct": "Spelling, syntax, and terminology are accurate and professional throughout the text.",
+          "Complete": "The document is incomplete as a technical plan, lacking detailed architectural blueprints, completion timelines, and explicit itemization of all 23 planned features.",
+          "Courteous": "The tone is appropriately professional, respectful, and structured for academic supervisors and technical evaluators.",
+          "Concrete": "Quantitative status metrics (13 of 23 features implemented) are helpful, but the core feature breakdowns lack specific technical methodologies.",
+          "Consistent": "Labeling and prioritization frameworks are consistent, though presentation transitions between features and summary notes are abrupt."
+        },
+        "seven_cs_scores": {
+          "Clear": 75,
+          "Concise": 80,
+          "Correct": 88,
+          "Complete": 50,
+          "Courteous": 90,
+          "Concrete": 60,
+          "Consistent": 70
+        },
+        "strengths": [
+          "Slide 1 (Summary for Supervisor): Effectively highlights unique competitive differentiators, such as dual text and speech 7C analysis, establishing strong research and commercial value.",
+          "Slide 1 (Feature Hierarchy): Logical categorization of features into Core, Unique, Voice, and Research contribution components.",
+          "Slide 1 (Status Overview): Clear quantitative tracking (13 of 23 completed) provides an immediate operational status update."
+        ],
+        "recommendations": [
+          "Slide 1 (Master Checklist): Expand the checklist to explicitly list all 23 planned features and their granular status, rather than referencing them abstractly.",
+          "Slide 1 (Technical Blueprint): Integrate detailed system architecture diagrams explaining the frontend (React) and backend (FastAPI) interaction patterns.",
+          "Slide 1 (Summary for Supervisor): Introduce a concrete delivery timeline, risk matrix, and immediate call-to-action outlining next steps for supervisor sign-off."
+        ],
+        "detailed_feedback": "The PRESENOVA Final Year Project (FYP) Technical Plan establishes a strong foundation by identifying key differentiators and providing a high-level progress tracking structure. The project's unique selling propositions\u2014such as multi-draft comparison, speech intelligence analysis, and 7C evaluation\u2014are clearly defined and tailored well for an academic supervisory audience. The tone is suitably formal, and the document avoids non-essential fluff.\n\nHowever, as a 'Technical Plan,' the content suffers from significant depth issues. The document functions more like an outline or pitch deck summary than a comprehensive technical blueprint. It mentions that 13 of 23 features are implemented, yet fails to itemize all 23 features across the document. Additionally, there is a lack of concrete technical specifications regarding how React, Python, and FastAPI interact, how AI prompts are structured, or how data models are validated.\n\nTo improve the presentation, the document should be restructured into distinct slides with a logical progression: Problem & Solution, System Architecture, Feature Matrix (fully itemized), Competitive Analysis, and Execution Roadmap. Adding explicit timelines, concrete technical deliverables, and a clear call-to-action for supervisor feedback will significantly elevate its academic rigor and commercial viability.",
+        "improved_text": "SLIDE 1: Title & Executive Overview\nGood morning, esteemed supervisor and committee members. Today, I am presenting the technical progress and architectural plan for PRESENOVA\u2014an AI-driven presentation and communication coaching platform built with React, Python, and FastAPI.\n\nSLIDE 2: Project Architecture & Tech Stack\nPRESENOVA leverages a modern, scalable web stack. The frontend is built using React to provide real-time interactive user dashboards, speech intelligence visualizations, and multi-draft comparisons. The backend is powered by FastAPI in Python, managing asynchronous AI analysis engines, 7C communication evaluation algorithms, and audio processing pipelines.\n\nSLIDE 3: Implementation Status & Feature Breakdown\nTo date, 13 of our 23 planned features are fully operational, 1 is in partial development, and 9 remain to be implemented.\n- Core Stack (Implemented): Authentication & User Management (Feature 1), Document Upload & 7C Text Analysis Engine (Feature 2), Multi-Draft Comparison Platform (Feature 3), and AI Chat Assistant (Feature 5).\n- In Development: Speech Intelligence Lab (Feature 4 - Voice Analysis).\n- Upcoming High-Priority Modules: Expert Validation Framework (Feature 7), Audience-Adaptive Scoring Engine (Feature 8A), Communication Style Profiler (Feature 8B), and Gamification System (Feature 8C).\n\nSLIDE 4: Competitive Advantage & Research Contribution\nPRESENOVA introduces four distinct capabilities that set it apart from existing market tools:\n1. Integrated 7C Analysis on Written Documents.\n2. Audio-based 7C Speech Analysis.\n3. Side-by-Side Multi-Draft Progress Comparison.\n4. Quantitative Percentage Improvement Tracking over time.\n\nSLIDE 5: Strategic Roadmap & Supervisor Next Steps\nOur immediate focus over the next milestone is delivering the Expert Validation Framework, Audience-Adaptive Scoring Engine, and Progress Dashboard. These additions ensure academic rigor while finalizing commercial viability. I welcome your feedback on our evaluation metrics and request approval for our phase two implementation roadmap.",
+        "original_text": "PRESENOVA \u2014 FYP Technical Plan\nComplete Feature Blueprint: Frontend + Backend | React + Python/FastAPI\nStatus:  Done    Partial    Missing     Priority:  HIGH    MED    LOW \nFeature 1: Authentication & User Management\nFeature 2: Document Upload & 7C Analysis (Core)\nFeature 3: Multi-Draft Comparison (Unique Feature)\nFeature 4: Speech Intelligence Lab (Voice Feature)\nFeature 5: AI Chat (Q&A Assistant)\nFeature 6: User Dashboard & Progress Analytics\nFeature 7: Expert Validation Framework (Research Contribution)\nFeature 8: Enhancement Features (Add for Final Evaluation)\n8A \u2014 Audience-Adaptive Scoring Engine\n8B \u2014 Communication Style Profiler\n8C \u2014 Gamification & Streaks\nMaster Checklist \u2014 What Exists vs What's Missing\nSummary for Supervisor\nCurrent Status: 13 of 23 planned features are fully implemented. 1 is partial. 9 are missing.\nUnique Features: 4 features exist in Presenova that NO competitor offers \u2014 7C on written docs, 7C on speech, multi-draft comparison, and % improvement tracking.\nPriority Additions: Expert Validation Framework + Audience-Adaptive Scoring + Progress Dashboard. These three additions make the project academically rigorous and commercially viable.",
+        "status": "success",
+        "analysis_timestamp": "2026-07-28T06:55:49.822865"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "c515a1b8-b52f-4366-9a7d-2bc172d18c51",
+      "created_at": "2026-07-28T06:55:49.869000",
+      "updated_at": "2026-07-28T06:55:49.869000",
+      "_id": "6a6852755b233312fce4a16a"
+    },
+    {
+      "id": "2462c165-e1b1-4fdb-aca2-2a6a2d5ef738",
+      "report_json": {
+        "status": "success",
+        "word_count": 17,
+        "speech_speed_wpm": 113.33,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 9,
+        "actionable_feedback": [
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 95,
+        "transcript": " Record your speech. Click start recording to begin. We will analyze your pacing clarity and 7C score.",
+        "overall_score": 72,
+        "category_scores": {
+          "Structure": 60,
+          "Clarity": 85,
+          "Persuasion": 55,
+          "Content_Quality": 60,
+          "Call_to_Action": 75
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The instruction is direct and clear, leaving no ambiguity about what step the listener should take next.",
+          "Concise": "The statement is brief and free of filler words, though the speaking rate of 113 WPM is slightly beneath the ideal range.",
+          "Correct": "The grammar and syntax are fully correct, with proper word choices and sentence construction.",
+          "Complete": "While concise for a system prompt, it lacks broader context or explanation regarding what the speech analysis entails.",
+          "Courteous": "The tone is professional, helpful, and polite, suitable for guiding a user or audience member.",
+          "Concrete": "Specific terms like 'pacing clarity' and '7C score' are highlighted, providing tangible reference points.",
+          "Consistent": "The delivery maintains a uniform, objective tone and pace across the short 9-second span."
+        },
+        "seven_cs_scores": {
+          "Clear": 88,
+          "Concise": 82,
+          "Correct": 95,
+          "Complete": 50,
+          "Courteous": 90,
+          "Concrete": 75,
+          "Consistent": 85
+        },
+        "strengths": [
+          "Zero filler words or repeated phrases were detected, producing a crisp and clean delivery.",
+          "Grammatically precise phrasing ('Record your speech. Click start recording to begin.') ensures instant clarity.",
+          "Includes a direct call to action instructing the listener exactly what action to take."
+        ],
+        "recommendations": [
+          "Slightly increase your speaking speed from 113.33 WPM to at least 125 WPM to sound more dynamic and conversational.",
+          "Elaborate on the benefits of the analysis to create a more compelling and persuasive message.",
+          "Add transition words to link the action of recording with the benefit of the analysis seamlessly."
+        ],
+        "detailed_feedback": "Your delivery demonstrated strong clarity and vocal control, achieving a completely clean recording with zero filler words or repeated phrases. The instructions were articulate and easy to understand. However, at 113.33 WPM, your speaking pace is slightly below the recommended conversational baseline of 120\u2013160 WPM. Increasing your tempo slightly will help project greater energy and engagement.\n\nFrom a structural perspective, the script functions as a quick UI prompt rather than a complete speech. While it includes a clear directive ('Click start recording to begin'), it lacks introductory context or a satisfying conclusion explaining why the analysis matters to the speaker. To improve content quality, aim to flesh out the value proposition of the presentation coach tool.\n\nOverall, your fundamental vocal clarity and grammatical precision are excellent. By expanding the content into a cohesive narrative and elevating your delivery speed slightly, you will create a much more persuasive and professional presentation.",
+        "improved_text": "### Introduction\nWelcome to your speech coaching session. Today, we will evaluate and refine your public speaking skills.\n\n### Action Items\nTo begin, please record your speech by clicking the 'Start Recording' button below.\n\n### Conclusion\nOnce finished, our system will analyze your delivery in real time, measuring your pacing, vocal clarity, and overall 7 Cs score to help you present with maximum confidence.",
+        "analysis_timestamp": "2026-07-28T06:56:49.720984"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "fb800cf8-3d82-4c62-a45c-a54f840f91a2",
+      "created_at": "2026-07-28T06:56:49.771000",
+      "updated_at": "2026-07-28T06:56:49.771000",
+      "_id": "6a6852b15b233312fce4a16c"
+    },
+    {
+      "id": "222614c4-b00b-4bb7-8b23-ddd12b92f4f5",
+      "report_json": {
+        "overall_score": 70,
+        "document_name": "Speech_Analysis_Report.pdf",
+        "category_scores": {
+          "Structure": 58,
+          "Clarity": 82,
+          "Persuasion": 52,
+          "Content_Quality": 58,
+          "Call_to_Action": 70,
+          "Grammar_and_Syntax": 62,
+          "Accuracy": 75,
+          "Tone_Appropriateness": 85,
+          "Audience_Alignment": 65,
+          "Purpose_Fulfillment": 60
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The fundamental messaging regarding speech metrics is clear, but structural gaps make the overarching goal feel incomplete.",
+          "Concise": "The narrative avoids excessive wordiness, but relies heavily on sparse bullet points that lack necessary context.",
+          "Correct": "The core prose is grammatically sound, but severe character encoding and kerning artifacts on Page 2 undermine technical correctness.",
+          "Complete": "The presentation lacks critical components such as introductory context, an overarching story, and a meaningful call-to-action.",
+          "Courteous": "The tone remains encouraging, professional, and constructive throughout the feedback summary.",
+          "Concrete": "Exact data points like 113.33 WPM are helpful, but qualitative guidance lacks concrete examples of how to improve content.",
+          "Consistent": "Inconsistent formatting, wide-character spacing glitches, and merged footer text disrupt visual and stylistic harmony."
+        },
+        "seven_cs_scores": {
+          "Clear": 80,
+          "Concise": 82,
+          "Correct": 60,
+          "Complete": 52,
+          "Courteous": 88,
+          "Concrete": 74,
+          "Consistent": 55
+        },
+        "strengths": [
+          "Page 1 (Section 3): Delivers clear, precise quantitative feedback highlighting articulate delivery, zero filler words, and clean articulation.",
+          "Page 1 (Section 2 & 3): Effectively incorporates specific metrics such as 113.33 WPM to give the speaker an exact baseline for tempo evaluation.",
+          "Page 2 (Section 4): Clearly categorizes actionable improvements into achieved milestones and target areas for future polish."
+        ],
+        "recommendations": [
+          "Page 2 (Section 4): Fix critical rendering errors and character encoding bugs (e.g., extra spaces between letters and corrupted symbols like '& \u00fe').",
+          "Page 1 (Section 1 & 2): Clarify why Version 1 and Version 2 reflect identical scores (72/100, 0% gain) to avoid user confusion regarding revision efficacy.",
+          "Page 1 & 2 (Overall Structure): Expand the brief UI prompt into a structured presentation script containing an engaging opening hook, contextual value proposition, and formal closing."
+        ],
+        "detailed_feedback": "The Speech Analysis Report provides valuable vocal delivery analytics, but suffers from notable presentation and formatting deficiencies. While the numerical breakdown and AI synthesis offer clear metrics (e.g., speaking pace of 113.33 WPM and zero filler words), the document fails to show dynamic growth between Version 1 and Version 2, registering a flat 0% gain across all dimensions. This lack of progression creates confusion about whether the second iteration was actually evaluated or simply duplicated.\n\nFrom a technical and visual standpoint, Page 2 exhibits severe layout and encoding corruption. Checklist items suffer from absurdly stretched kerning (e.g., 'N o f i l l e r w o r d s d e t e c t e d') and corrupted symbols ('& \u00fe'), significantly degrading document professionalism. Furthermore, footers are merged directly into page body text without proper spacing ('Page 1 of 2Generated by...').\n\nStructurally, the evaluated text functions as a brief system prompt rather than a complete speech. To elevate this report into an effective coaching delivery, the script must be expanded into a unified, persuasive story that frames performance data around clear development goals and actionable practice strategies.",
+        "improved_text": "Slide 1: Title & Executive Summary\nGood morning, team. Today I am sharing the performance summary from our AI Presentation & Pitch Practice Session conducted on July 28, 2026. This evaluation tracks baseline speech performance against key communication standards, giving us a clear roadmap for presentation excellence.\n\nSlide 2: Baseline vs. Revision Performance\nOur comparative analysis across iterations shows a stable baseline overall score of 72 out of 100. Key category breakdown: Clarity leads at 85%, followed by Call to Action at 75%. Structure and Content Quality currently stand at 60%, while Persuasion holds at 55%. These initial scores highlight a clean technical delivery while pinpointing exact opportunities for storytelling and structural enhancement.\n\nSlide 3: Delivery Analysis & Vocal Dynamics\nThe speaker demonstrated exceptional vocal control and precise articulation, achieving a spotless recording with zero filler words or repetitive phrases. Currently, the delivery pace is 113 WPM\u2014slightly below the conversational standard of 120 to 160 WPM. Accelerating pace slightly to 125 WPM will instantly infuse greater warmth, energy, and dynamic conviction into the message.\n\nSlide 4: Content Structure & Persuasion Enhancement\nWhile technical clarity is high, the current script operates as a concise prompt rather than a fully developed presentation. To maximize persuasive impact, we recommend expanding the narrative structure: open with an engaging industry hook, articulate the core value proposition, and seamlessly link call-to-action directives with tangible outcome benefits.\n\nSlide 5: Action Plan & Next Steps\nMoving forward, our focus centers on three key milestones: First, increase speaking cadence to at least 125 WPM. Second, lengthen speech duration to allow for comprehensive coaching feedback. Third, integrate transition phrases that convert technical prompts into compelling narrative points. Thank you, and let us begin our next practice session.",
+        "original_text": "Speech Analysis Report\nPracticed Topic/File: Speech Practice Session Generated on: 28/07/2026\n1. Score Progression Summary\nVersion 1 (Baseline) Version 2 (Revision) Overall Progress Gain\n72 / 100 72 / 100 +0 Points\n2. Performance Category Scores\nCategory / Dimension V1 Score V2 Score Progress\nStructure 60% 60% 0%\nClarity 85% 85% 0%\nPersuasion 55% 55% 0%\nContent Quality 60% 60% 0%\nCall to Action 75% 75% 0%\n3. AI Coach Progress Synthesis\nYour delivery demonstrated strong clarity and vocal control, achieving a completely clean recording with zero filler\nwords or repeated phrases. The instructions were articulate and easy to understand. However, at 113.33 WPM,\nyour speaking pace is slightly below the recommended conversational baseline of 120\u2013160 WPM. Increasing your\ntempo slightly will help project greater energy and engagement.\nFrom a structural perspective, the script functions as a quick UI prompt rather than a complete speech. While it\nincludes a clear directive ('Click start recording to begin'), it lacks introductory context or a satisfying conclusion\nexplaining why the analysis matters to the speaker. To improve content quality, aim to flesh out the value\nproposition of the presentation coach tool.\nOverall, your fundamental vocal clarity and grammatical precision are excellent. By expanding the content into a\ncohesive narrative and elevating your delivery speed slightly, you will create a much more persuasive and\nprofessional presentation.\n4. Recommendations & Outcomes\nPage 1 of 2Generated by AI Presentation & Pitch Analyzer\nKey Improvements Achieved:\n[x] Slightly increase your speaking speed from 113.33 WPM to at least 125 WPM to sound more dynamic and\nconversational.\n[x] Elaborate on the benefits of the analysis to create a more compelling and persuasive message.\n[x] Add transition words to link the action of recording with the benefit of the analysis seamlessly.\nRemaining Areas to Polish:\n\u0000[\u0000 \u0000]\u0000 '\u0005\u0000 \u0000N\u0000o\u0000 \u0000f\u0000i\u0000l\u0000l\u0000e\u0000r\u0000 \u0000w\u0000o\u0000r\u0000d\u0000s\u0000 \u0000d\u0000e\u0000t\u0000e\u0000c\u0000t\u0000e\u0000d\u0000.\u0000 \u0000E\u0000x\u0000c\u0000e\u0000l\u0000l\u0000e\u0000n\u0000t\u0000!\n\u0000[\u0000 \u0000]\u0000 '\u0005\u0000 \u0000G\u0000o\u0000o\u0000d\u0000 \u0000w\u0000o\u0000r\u0000d\u0000 \u0000v\u0000a\u0000r\u0000i\u0000e\u0000t\u0000y\u0000 \u0000a\u0000n\u0000d\u0000 \u0000n\u0000o\u0000 \u0000r\u0000e\u0000p\u0000e\u0000t\u0000i\u0000t\u0000i\u0000o\u0000n\u0000s\u0000.\n\u0000[\u0000 \u0000]\u0000 &\u00a0\u00fe\u000f\u0000 \u0000S\u0000h\u0000o\u0000r\u0000t\u0000 \u0000s\u0000p\u0000e\u0000e\u0000c\u0000h\u0000 \u0000r\u0000e\u0000c\u0000o\u0000r\u0000d\u0000i\u0000n\u0000g\u0000.\u0000 \u0000S\u0000p\u0000e\u0000a\u0000k\u0000 \u0000l\u0000o\u0000n\u0000g\u0000e\u0000r\u0000 \u0000f\u0000o\u0000r\u0000 \u0000m\u0000o\u0000r\u0000e\u0000 \u0000c\u0000o\u0000m\u0000p\u0000r\u0000e\u0000h\u0000e\u0000n\u0000s\u0000i\u0000v\u0000e\u0000 \u0000f\u0000e\u0000e\u0000d\u0000b\u0000a\u0000c\u0000k\u0000.\nPage 2 of 2Generated by AI Presentation & Pitch Analyzer",
+        "status": "success",
+        "analysis_timestamp": "2026-07-28T07:25:02.400990"
+      },
+      "report_type": "document_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "c63949c7-9fd3-41d6-9284-8df5012ba97c",
+      "created_at": "2026-07-28T07:25:02.433000",
+      "updated_at": "2026-07-28T07:25:02.433000",
+      "_id": "6a68594e5b233312fce4a170"
+    },
+    {
+      "id": "1791efeb-c91a-4813-97fd-bed60b43470f",
+      "report_json": {
+        "status": "success",
+        "word_count": 1,
+        "speech_speed_wpm": 20.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 3,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too slowly (20.0 WPM). Try to maintain 120-160 WPM.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 85,
+        "transcript": " .",
+        "overall_score": 20,
+        "category_scores": {
+          "Structure": 10,
+          "Clarity": 20,
+          "Persuasion": 10,
+          "Content_Quality": 10,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The recording contained no spoken words, making it impossible to convey or evaluate a clear message.",
+          "Concise": "While the 3-second duration was brief, the lack of spoken text means conciseness could not be properly demonstrated.",
+          "Correct": "There were no grammatical structures present in the transcript to assess for language accuracy.",
+          "Complete": "The recording ended before any point, argument, or thought could be introduced.",
+          "Courteous": "No tone was established, though no discourteous language or delivery was present.",
+          "Concrete": "The audio lacked specific details, facts, or illustrative content entirely.",
+          "Consistent": "The brief 3-second recording did not offer enough spoken material to maintain a consistent pace or tone."
+        },
+        "seven_cs_scores": {
+          "Clear": 20,
+          "Concise": 30,
+          "Correct": 50,
+          "Complete": 0,
+          "Courteous": 50,
+          "Concrete": 0,
+          "Consistent": 30
+        },
+        "strengths": [
+          "The audio duration was brief and contained no filler words or vocal clutter.",
+          "The recording began cleanly without background noise artifacts.",
+          "The session establishes a clear baseline for future speaking tests."
+        ],
+        "recommendations": [
+          "Ensure your microphone is active and begin speaking clearly as soon as the recording starts.",
+          "Prepare an outline with a clear opening statement, supporting points, and a strong conclusion.",
+          "Aim for a consistent speaking pace between 120 and 160 words per minute during your presentation."
+        ],
+        "detailed_feedback": "The provided transcript consists only of a period across a 3-second recording duration, resulting in a calculated pace of 20.0 WPM. Because no articulate words were captured, the recording appears to be an accidental capture, long silence, or a technical glitch.\n\nTo build an effective presentation, start by preparing a short script or bulleted outline before recording. Focus on starting immediately with an engaging opening sentence to capture your audience's attention and establish your topic right away.\n\nWhen speaking, maintain a steady tempo between 120 and 160 WPM. Project your voice clearly, articulate key terms, and conclude with a direct summary or call to action to deliver a full and persuasive message.",
+        "improved_text": "### Introduction\nHello and welcome. Today, I am excited to share key updates regarding our project goals and communication strategy.\n\n### Core Message\nTo communicate effectively, we must focus on clarity, concise delivery, and structured presentation. By planning our main points in advance, we ensure that every message resonates with our audience.\n\n### Call to Action\nLet us implement these principles in our upcoming presentations to foster engagement and achieve impactful results. Thank you for your time.",
+        "analysis_timestamp": "2026-07-28T07:25:33.909938"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "2bc11a7f-d247-4896-9932-1d28b8a626b5",
+      "created_at": "2026-07-28T07:25:33.948000",
+      "updated_at": "2026-07-28T07:25:33.948000",
+      "_id": "6a68596d5b233312fce4a172"
+    },
+    {
+      "id": "f196123a-5405-4567-aa24-3e1ee041afdf",
+      "report_json": {
+        "status": "success",
+        "word_count": 9,
+        "speech_speed_wpm": 180.0,
+        "filler_words_count": 0,
+        "filler_words_percentage": 0.0,
+        "repetition_count": 0,
+        "duration_seconds": 3,
+        "actionable_feedback": [
+          "\u26a0\ufe0f Speaking too fast (180.0 WPM). Aim for 120-160 WPM for better clarity.",
+          "\u2705 No filler words detected. Excellent!",
+          "\u2705 Good word variety and no repetitions.",
+          "\u26a0\ufe0f Short speech recording. Speak longer for more comprehensive feedback."
+        ],
+        "clarity_score": 80,
+        "transcript": " Hello, I'm a student at the University of California,",
+        "overall_score": 40,
+        "category_scores": {
+          "Structure": 20,
+          "Clarity": 60,
+          "Persuasion": 20,
+          "Content_Quality": 25,
+          "Call_to_Action": 10
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The introductory words are articulate and understandable, but the core message is missing because the sentence was cut off.",
+          "Concise": "The opening is direct with zero filler words, but the speech rate of 180 WPM is overly rushed.",
+          "Correct": "The fragment is grammatically correct and uses appropriate language, though it remains incomplete.",
+          "Complete": "The speech is highly incomplete, ending abruptly mid-sentence after only three seconds.",
+          "Courteous": "The opening greeting 'Hello' sets an appropriate, polite, and professional tone.",
+          "Concrete": "Mentioning the 'University of California' provides a solid anchor, but no further specifics were given.",
+          "Consistent": "The tone is professional, but the delivery is too short to establish consistent vocal rhythm."
+        },
+        "seven_cs_scores": {
+          "Clear": 60,
+          "Concise": 70,
+          "Correct": 85,
+          "Complete": 15,
+          "Courteous": 90,
+          "Concrete": 40,
+          "Consistent": 50
+        },
+        "strengths": [
+          "Used a direct and polite opening greeting ('Hello, I'm a student...').",
+          "Maintained clean vocal delivery with 0 filler words and no repeated phrases.",
+          "Clearly named a specific institution ('University of California') to establish background."
+        ],
+        "recommendations": [
+          "Reduce speaking pace from 180 WPM to the optimal range of 120-160 WPM to allow the audience to digest information.",
+          "Complete the full thought by adding the purpose of your introduction, key points, and a concluding remark.",
+          "Incorporate a clear structural flow including an introduction, core message, and a call to action."
+        ],
+        "detailed_feedback": "The provided audio sample is extremely brief, lasting only 3 seconds and ending abruptly mid-sentence on 'University of California,'. While the words spoken are grammatically correct and free of filler words or repetitions, the brevity makes it impossible to evaluate a complete speech structure, argument depth, or call to action.\n\nFrom a vocal delivery standpoint, the measured pacing of 180.0 WPM is significantly faster than the recommended conversational range of 120 to 160 WPM. This rapid delivery makes the greeting feel rushed and frantic rather than confident and composed. Pausing after the greeting would help ground your presence.\n\nTo improve future recordings, focus on delivering a complete thought with a clear beginning, middle, and end. Slow down your vocal cadence to emphasize key details about your academic focus or topic of interest, ensuring your audience has time to engage with your message.",
+        "improved_text": "### Introduction\nHello. My name is Alex, and I am currently a student at the University of California.\n\n### Main Message\nToday, I would like to share our team's research on modern communication strategies and how clear speech impacts public engagement. Through our work, we have identified key techniques that help speakers connect more effectively with their audience.\n\n### Conclusion & Call to Action\nThank you for your time. I invite you to join our upcoming workshop to learn more about applying these techniques in your own presentations.",
+        "analysis_timestamp": "2026-07-28T07:26:10.842360"
+      },
+      "report_type": "speech_analysis",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "upload_id": "ac842e30-78ce-4a55-85a6-196e44e1cfaf",
+      "created_at": "2026-07-28T07:26:10.881000",
+      "updated_at": "2026-07-28T07:26:10.881000",
+      "_id": "6a6859925b233312fce4a174"
+    }
+  ],
   "presentation_sessions": [
     {
       "id": "a0320a32-82c6-4452-8201-5a27b6707a2a",
@@ -2779,6 +4062,216 @@
         ]
       },
       "_id": "6a5348255089802cd1f3677c"
+    },
+    {
+      "id": "56592bf2-ea29-475b-bcdc-3234bd58b17a",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "health",
+      "status": "STREAMING",
+      "started_at": "2026-07-24T23:10:42.975000",
+      "ended_at": "2026-07-24T23:10:42.975000",
+      "metrics": {
+        "eye_contact_scores": [
+          86,
+          85
+        ],
+        "posture_scores": [
+          79,
+          83
+        ],
+        "wpm_history": [
+          20
+        ],
+        "fillers_detected": 0,
+        "transcripts": [
+          "Hello."
+        ],
+        "interruptions": [],
+        "confidence_scores": [
+          9,
+          10
+        ],
+        "vocal_sentiment_scores": [
+          78
+        ]
+      },
+      "_id": "6a63f0f2d981bbc31fc78213"
+    },
+    {
+      "id": "8c43c385-45c5-45c2-b01b-e844a3e2ecbb",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "status": "FINISHED",
+      "started_at": "2026-07-25T06:10:18.059000",
+      "ended_at": "2026-07-25T06:10:55.442000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [
+          20
+        ],
+        "fillers_detected": 0,
+        "transcripts": [
+          "."
+        ],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": [
+          78
+        ]
+      },
+      "_id": "6a64534aa466d2b22bd7c784"
+    },
+    {
+      "id": "45a8853d-367c-4b70-9bdf-2f1c0f130fd1",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "status": "FINISHED",
+      "started_at": "2026-07-25T06:11:59.747000",
+      "ended_at": "2026-07-25T06:12:32.531000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [
+          20
+        ],
+        "fillers_detected": 0,
+        "transcripts": [
+          "."
+        ],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": [
+          78
+        ]
+      },
+      "_id": "6a6453afa466d2b22bd7c786"
+    },
+    {
+      "id": "889b2092-a2b9-4977-9fcf-399ab52fdfc4",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "blackchain",
+      "status": "FINISHED",
+      "started_at": "2026-07-25T06:30:09.212000",
+      "ended_at": "2026-07-25T06:30:14.352000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [
+          40
+        ],
+        "fillers_detected": 0,
+        "transcripts": [
+          "Thank you."
+        ],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": [
+          78
+        ]
+      },
+      "_id": "6a6457f186b8be81135f8c89"
+    },
+    {
+      "id": "67966a78-13e5-4cdb-b160-8638b6db23ca",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "status": "FINISHED",
+      "started_at": "2026-07-27T08:48:38.752000",
+      "ended_at": "2026-07-27T08:48:49.232000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [],
+        "fillers_detected": 0,
+        "transcripts": [],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": []
+      },
+      "_id": "6a671b66522770ea950f56fd"
+    },
+    {
+      "id": "76c112e2-4685-4d65-a811-b98c4f65ee89",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "blockchain",
+      "status": "FINISHED",
+      "started_at": "2026-07-27T08:49:24.257000",
+      "ended_at": "2026-07-27T08:50:12.294000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [],
+        "fillers_detected": 0,
+        "transcripts": [],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": []
+      },
+      "_id": "6a671b94522770ea950f56ff"
+    },
+    {
+      "id": "b813792c-5d34-43f4-8f42-68cc3ff6e336",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "m",
+      "status": "STREAMING",
+      "started_at": "2026-07-27T08:50:20.818000",
+      "ended_at": "2026-07-27T08:50:20.818000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [],
+        "fillers_detected": 0,
+        "transcripts": [],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": []
+      },
+      "_id": "6a671bcc522770ea950f5701"
+    },
+    {
+      "id": "6234df37-762f-4424-9242-2af39c7c8655",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "learning",
+      "status": "FINISHED",
+      "started_at": "2026-07-27T08:51:00.080000",
+      "ended_at": "2026-07-27T08:51:18.733000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [],
+        "fillers_detected": 0,
+        "transcripts": [],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": []
+      },
+      "_id": "6a671bf4522770ea950f5702"
+    },
+    {
+      "id": "fad2d76e-b633-49cf-80a0-008d7b27b96a",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "about BI",
+      "status": "FINISHED",
+      "started_at": "2026-07-28T06:58:34.747000",
+      "ended_at": "2026-07-28T06:58:48.020000",
+      "metrics": {
+        "eye_contact_scores": [],
+        "posture_scores": [],
+        "wpm_history": [
+          40
+        ],
+        "fillers_detected": 0,
+        "transcripts": [
+          "Thank you."
+        ],
+        "interruptions": [],
+        "confidence_scores": [],
+        "vocal_sentiment_scores": [
+          78
+        ]
+      },
+      "_id": "6a68531a5b233312fce4a16d"
     }
   ],
   "historical_reports": [
@@ -2921,6 +4414,506 @@
       },
       "created_at": "2026-07-12T00:58:49.297000",
       "_id": "6a52e6c90dc4552f27559e8f"
+    },
+    {
+      "id": "3c02977b-be74-4af6-ba94-134d26184d1f",
+      "session_id": "8c43c385-45c5-45c2-b01b-e844a3e2ecbb",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "report_json": {
+        "overall_score": 40,
+        "category_scores": {
+          "Structure": 10,
+          "Clarity": 10,
+          "Persuasion": 10,
+          "Content_Quality": 5,
+          "Call_to_Action": 5
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The presentation lacked clarity due to an almost non-existent transcript and zero eye contact recorded throughout the session.",
+          "Concise": "While no filler words were detected, a speaking pace of 20 WPM reflects severe hesitance rather than true conciseness.",
+          "Correct": "Due to the absence of spoken text, grammatical accuracy and professional pronunciation could not be meaningfully demonstrated.",
+          "Complete": "The presentation failed to cover the assigned topic of Pakistan, providing no key points, context, or conclusions.",
+          "Courteous": "A zero posture score and total absence of audience engagement showed a lack of professional presence.",
+          "Concrete": "The transcript provided no concrete facts, statistics, or specific statements regarding Pakistan.",
+          "Consistent": "Consistency was absent across gaze pattern and posture stability, both registering at zero."
+        },
+        "seven_cs_scores": {
+          "Clear": 10,
+          "Concise": 20,
+          "Correct": 10,
+          "Complete": 0,
+          "Courteous": 10,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [
+          "No filler words were recorded during the delivery.",
+          "The session provided a clear baseline to build core presentation skills.",
+          "Opportunity to develop a structured narrative from the ground up."
+        ],
+        "recommendations": [
+          "Increase speaking pace to an ideal range of 130-150 WPM to maintain natural conversational flow.",
+          "Practice maintaining upright posture and direct eye contact with the audience to convey confidence.",
+          "Prepare a well-researched script covering key historical, cultural, and economic insights about Pakistan."
+        ],
+        "qna_analysis": "There was no active engagement during the Q&A panel session, resulting in a zero score for handling panel interruptions.",
+        "improved_text": "### Overview of Pakistan: Heritage, Potential, and Progress\n\nGood morning members of the panel and distinguished guests. Today, I am pleased to present an overview of Pakistan\u2014a nation rich in culture, strategic significance, and economic potential.\n\n#### Cultural and Historical Heritage\nPakistan stands at the crossroads of South Asia, Central Asia, and the Middle East. Home to ancient civilizations such as the Indus Valley Civilization at Mohenjo-Daro and Harappa, the region possesses a deeply rooted cultural identity characterized by diverse languages, traditions, and historic architecture.\n\n#### Strategic and Economic Landscape\nEconomically, Pakistan is driven by its agriculture, textile industry, and a rapidly growing technology sector. With a young and dynamic population\u2014where over 60 percent of people are under the age of 30\u2014the country holds immense potential for digital innovation and entrepreneurial growth.\n\n#### Looking to the Future\nTo fully realize its potential, Pakistan is actively addressing key challenges in energy, infrastructure development, and educational reform. Strategic global partnerships and investments in renewable energy remain central to its long-term economic strategy.\n\n#### Conclusion\nIn conclusion, Pakistan represents a nation of resilience and opportunity. By leveraging its strategic location, vibrant youth, and economic resources, it is well-positioned for future progress. Thank you for your time, and I welcome any questions from the panel.",
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "First session on this topic recorded. Great start!"
+        },
+        "topic": "pakistan",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 20,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 78,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 1,
+            "transcript_segments": 1,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": true,
+            "has_qna_scores": false
+          }
+        }
+      },
+      "created_at": "2026-07-25T06:10:55.435000",
+      "_id": "6a64536fa466d2b22bd7c785"
+    },
+    {
+      "id": "f9f63f3a-6c82-4241-b310-550eed4e6ca4",
+      "session_id": "45a8853d-367c-4b70-9bdf-2f1c0f130fd1",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "report_json": {
+        "overall_score": 40,
+        "category_scores": {
+          "Structure": 5,
+          "Clarity": 5,
+          "Persuasion": 5,
+          "Content_Quality": 5,
+          "Call_to_Action": 5
+        },
+        "seven_cs_evaluation": {
+          "Clear": "The presentation lacked clarity due to an absence of spoken content, zero eye contact, and non-existent vocal delivery.",
+          "Concise": "While no filler words were detected, the extremely low pace of 20 WPM represents near-total silence rather than concise delivery.",
+          "Correct": "Grammatical accuracy could not be evaluated due to the missing transcript content.",
+          "Complete": "The topic of Pakistan was left completely unaddressed without any supporting information or main points.",
+          "Courteous": "With zero eye contact and poor posture scores, the presenter did not demonstrate baseline audience engagement or professional courtesy.",
+          "Concrete": "The speech contained no concrete details, facts, or specific examples related to the topic.",
+          "Consistent": "Posture and gaze patterns showed no stability, reflecting an inactive presentation baseline."
+        },
+        "seven_cs_scores": {
+          "Clear": 5,
+          "Concise": 20,
+          "Correct": 10,
+          "Complete": 0,
+          "Courteous": 10,
+          "Concrete": 0,
+          "Consistent": 5
+        },
+        "strengths": [
+          "No filler words were detected during the recording session.",
+          "The technical recording environment successfully captured performance baselines.",
+          "There were no aggressive or inappropriate vocal interruptions."
+        ],
+        "recommendations": [
+          "Draft and deliver a complete script covering key topics related to Pakistan.",
+          "Increase speaking speed to a natural conversational pace between 130 and 150 WPM.",
+          "Maintain upright posture and direct eye contact with the camera or audience to establish credibility."
+        ],
+        "qna_analysis": "The presenter did not engage with the panel or respond to prompts, resulting in a zero score for Q&A interaction.",
+        "improved_text": "### Presentation: Understanding Pakistan - Heritage, Potential, and Progress\n\n**Introduction**\nGood day, respected panelists and audience members. Today, I am pleased to present an overview of Pakistan\u2014a country defined by its rich cultural heritage, strategic geographic importance, and growing economic potential.\n\n**Key Highlights**\n1. **Geographic Significance:** Situated at the intersection of South Asia, Central Asia, and the Middle East, Pakistan acts as a major corridor for regional trade and energy flows.\n2. **Demographic Potential:** Over 60% of Pakistan's population is under the age of 30, offering a dynamic workforce driving growth in technology and innovation.\n3. **Economic Outlook:** Through investment in infrastructure, agriculture, and digital technology, the nation continues to work toward long-term economic resilience.\n\n**Conclusion**\nIn summary, Pakistan presents vast opportunities through its human capital and strategic location. With continued reform, it remains a vital player in regional development. Thank you, and I look forward to your questions.",
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "Your score shifted from 40 to 40. Keep polishing your delivery!"
+        },
+        "topic": "pakistan",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 20,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 78,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 1,
+            "transcript_segments": 1,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": true,
+            "has_qna_scores": false
+          }
+        }
+      },
+      "created_at": "2026-07-25T06:12:32.519000",
+      "_id": "6a6453d0a466d2b22bd7c787"
+    },
+    {
+      "id": "e110b8e3-355a-4665-9c1b-d78572070de1",
+      "session_id": "889b2092-a2b9-4977-9fcf-399ab52fdfc4",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "blackchain",
+      "report_json": {
+        "overall_score": 0,
+        "category_scores": {
+          "Structure": 30,
+          "Clarity": 30,
+          "Persuasion": 30,
+          "Content_Quality": 30,
+          "Call_to_Action": 30
+        },
+        "seven_cs_evaluation": {
+          "Clear": "Eye-contact scoring was unavailable because no valid video samples were captured.",
+          "Concise": "Conciseness could not be scored from voice data because no transcript segments were captured.",
+          "Correct": "Formal presentation language was grammatically correct and pronunciation was clear.",
+          "Complete": "Presentation flow was uninterrupted, covering key points completely.",
+          "Courteous": "Posture-based courtesy signals were unavailable because video scoring did not run.",
+          "Concrete": "Concrete delivery could not be evaluated from speaking pace because audio scoring was unavailable.",
+          "Consistent": "Consistency could not be scored from visual metrics because no valid video samples were captured."
+        },
+        "seven_cs_scores": {
+          "Clear": 0,
+          "Concise": 0,
+          "Correct": 85,
+          "Complete": 80,
+          "Courteous": 0,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [
+          "Structured the presentation flow logically."
+        ],
+        "recommendations": [
+          "No video metrics were captured, so eye contact and posture could not be scored.",
+          "No voice transcript was captured, so pacing and filler-word metrics could not be scored."
+        ],
+        "qna_analysis": "No panelist interruptions occurred during this session.",
+        "improved_text": "No content provided.",
+        "insufficient_data": true,
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+        },
+        "topic": "blackchain",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 0,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 0,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 0,
+            "transcript_segments": 0,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": false,
+            "has_qna_scores": false,
+            "min_video_samples_required": 5,
+            "min_audio_samples_required": 3
+          }
+        }
+      },
+      "created_at": "2026-07-25T06:30:14.339000",
+      "_id": "6a6457f686b8be81135f8c8a"
+    },
+    {
+      "id": "f4399969-a989-4b8e-964a-443104630300",
+      "session_id": "67966a78-13e5-4cdb-b160-8638b6db23ca",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "pakistan",
+      "report_json": {
+        "overall_score": 0,
+        "category_scores": {
+          "Structure": 0,
+          "Clarity": 0,
+          "Persuasion": 0,
+          "Content_Quality": 0,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concise": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Correct": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Complete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Courteous": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concrete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Consistent": "Not scored \u2014 no camera or microphone data was captured for this session."
+        },
+        "seven_cs_scores": {
+          "Clear": 0,
+          "Concise": 0,
+          "Correct": 0,
+          "Complete": 0,
+          "Courteous": 0,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [],
+        "recommendations": [
+          "Turn on your camera and microphone before starting the session.",
+          "Speak clearly and stay in frame so eye contact and posture can be tracked."
+        ],
+        "qna_analysis": "No panelist interruptions occurred during this session.",
+        "detailed_feedback": "No usable video or audio data was captured during this session, so no delivery score could be generated. Check your camera and microphone permissions and try again.",
+        "improved_text": "No speech was captured during this session.",
+        "insufficient_data": true,
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+        },
+        "topic": "pakistan",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 0,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 0,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 0,
+            "transcript_segments": 0,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": false,
+            "has_qna_scores": false,
+            "min_video_samples_required": 5,
+            "min_audio_samples_required": 3
+          }
+        }
+      },
+      "created_at": "2026-07-27T08:48:49.221000",
+      "_id": "6a671b71522770ea950f56fe"
+    },
+    {
+      "id": "269d0a62-7732-4c1e-b0f6-861fcad2823d",
+      "session_id": "76c112e2-4685-4d65-a811-b98c4f65ee89",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "blockchain",
+      "report_json": {
+        "overall_score": 0,
+        "category_scores": {
+          "Structure": 0,
+          "Clarity": 0,
+          "Persuasion": 0,
+          "Content_Quality": 0,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concise": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Correct": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Complete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Courteous": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concrete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Consistent": "Not scored \u2014 no camera or microphone data was captured for this session."
+        },
+        "seven_cs_scores": {
+          "Clear": 0,
+          "Concise": 0,
+          "Correct": 0,
+          "Complete": 0,
+          "Courteous": 0,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [],
+        "recommendations": [
+          "Turn on your camera and microphone before starting the session.",
+          "Speak clearly and stay in frame so eye contact and posture can be tracked."
+        ],
+        "qna_analysis": "No panelist interruptions occurred during this session.",
+        "detailed_feedback": "No usable video or audio data was captured during this session, so no delivery score could be generated. Check your camera and microphone permissions and try again.",
+        "improved_text": "No speech was captured during this session.",
+        "insufficient_data": true,
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+        },
+        "topic": "blockchain",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 0,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 0,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 0,
+            "transcript_segments": 0,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": false,
+            "has_qna_scores": false,
+            "min_video_samples_required": 5,
+            "min_audio_samples_required": 3
+          }
+        }
+      },
+      "created_at": "2026-07-27T08:50:12.278000",
+      "_id": "6a671bc4522770ea950f5700"
+    },
+    {
+      "id": "944ea810-57f2-4114-9dfd-3ab523a6174b",
+      "session_id": "6234df37-762f-4424-9242-2af39c7c8655",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "learning",
+      "report_json": {
+        "overall_score": 0,
+        "category_scores": {
+          "Structure": 0,
+          "Clarity": 0,
+          "Persuasion": 0,
+          "Content_Quality": 0,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concise": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Correct": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Complete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Courteous": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concrete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Consistent": "Not scored \u2014 no camera or microphone data was captured for this session."
+        },
+        "seven_cs_scores": {
+          "Clear": 0,
+          "Concise": 0,
+          "Correct": 0,
+          "Complete": 0,
+          "Courteous": 0,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [],
+        "recommendations": [
+          "Turn on your camera and microphone before starting the session.",
+          "Speak clearly and stay in frame so eye contact and posture can be tracked."
+        ],
+        "qna_analysis": "No panelist interruptions occurred during this session.",
+        "detailed_feedback": "No usable video or audio data was captured during this session, so no delivery score could be generated. Check your camera and microphone permissions and try again.",
+        "improved_text": "No speech was captured during this session.",
+        "insufficient_data": true,
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+        },
+        "topic": "learning",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 0,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 0,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 0,
+            "transcript_segments": 0,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": false,
+            "has_qna_scores": false,
+            "min_video_samples_required": 5,
+            "min_audio_samples_required": 3
+          }
+        }
+      },
+      "created_at": "2026-07-27T08:51:18.717000",
+      "_id": "6a671c06522770ea950f5703"
+    },
+    {
+      "id": "e7690fa5-2bd3-45bd-afa6-92b86ce02c55",
+      "session_id": "fad2d76e-b633-49cf-80a0-008d7b27b96a",
+      "user_id": "af6f4097-e550-4d18-af1e-8037ac8ac5cf",
+      "topic": "about bi",
+      "report_json": {
+        "overall_score": 0,
+        "category_scores": {
+          "Structure": 0,
+          "Clarity": 0,
+          "Persuasion": 0,
+          "Content_Quality": 0,
+          "Call_to_Action": 0
+        },
+        "seven_cs_evaluation": {
+          "Clear": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concise": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Correct": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Complete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Courteous": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Concrete": "Not scored \u2014 no camera or microphone data was captured for this session.",
+          "Consistent": "Not scored \u2014 no camera or microphone data was captured for this session."
+        },
+        "seven_cs_scores": {
+          "Clear": 0,
+          "Concise": 0,
+          "Correct": 0,
+          "Complete": 0,
+          "Courteous": 0,
+          "Concrete": 0,
+          "Consistent": 0
+        },
+        "strengths": [],
+        "recommendations": [
+          "Turn on your camera and microphone before starting the session.",
+          "Speak clearly and stay in frame so eye contact and posture can be tracked."
+        ],
+        "qna_analysis": "No panelist interruptions occurred during this session.",
+        "detailed_feedback": "No usable video or audio data was captured during this session, so no delivery score could be generated. Check your camera and microphone permissions and try again.",
+        "improved_text": "No speech was captured during this session.",
+        "insufficient_data": true,
+        "comparison": {
+          "improved": false,
+          "difference": 0,
+          "note": "No usable camera or voice data was captured this session. Make sure your camera and mic are on, then try again."
+        },
+        "topic": "about BI",
+        "session_metrics": {
+          "avg_eye_contact": 0,
+          "avg_posture": 0,
+          "avg_wpm": 0,
+          "total_fillers": 0,
+          "interruptions_handled": 0,
+          "avg_confidence": 0,
+          "avg_vocal_pitch": 0,
+          "data_quality": {
+            "video_samples": 0,
+            "audio_samples": 0,
+            "transcript_segments": 0,
+            "qna_scores": 0,
+            "has_video_metrics": false,
+            "has_audio_metrics": false,
+            "has_qna_scores": false,
+            "min_video_samples_required": 5,
+            "min_audio_samples_required": 3
+          }
+        }
+      },
+      "created_at": "2026-07-28T06:58:47.941000",
+      "_id": "6a6853275b233312fce4a16e"
     }
   ]
 }

@@ -145,6 +145,32 @@ def submit_presentation():
         if result.get('statistics'):
             response['statistics'] = result['statistics']
 
+        # Persist report history to database so dashboard analysis count stays accurate
+        try:
+            from flask_jwt_extended import get_jwt_identity
+            from models import Report
+            user_id = get_jwt_identity() or 'guest'
+            qs = result.get('quality_scores', {})
+            report_json = {
+                "overall_score": qs.get('overall_score', 85),
+                "topic": original_filename,
+                "presentation_title": original_filename,
+                "slides_processed": result.get('slides_processed', 0),
+                "category_scores": qs.get('category_scores', {}),
+                "seven_cs_scores": qs.get('seven_cs_scores', {}),
+                "improvements": result.get('improvements', []),
+                "mode": mode,
+                "tone": tone
+            }
+            Report.create(
+                report_json=report_json,
+                report_type='presentation_analysis',
+                user_id=user_id
+            )
+            logger.info(f"[routes/rewriter] Saved Report for presentation rewrite ({original_filename}) to user {user_id}")
+        except Exception as _re:
+            logger.warning(f"[routes/rewriter] Could not save Report history: {_re}")
+
         return jsonify(response), 200
     except ValueError as exc:
         logger.warning('[routes/rewriter] Validation error: %s', exc)

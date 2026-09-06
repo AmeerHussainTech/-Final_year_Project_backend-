@@ -18,7 +18,6 @@ import {
   AnalyticsData,
   RecommendationsData,
   PresentationStatistics,
-  FinalAssessment,
 } from '../services/presentationRewriterApi';
 import './PresentationRewriter.css';
 
