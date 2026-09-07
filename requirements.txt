@@ -24,4 +24,4 @@ Pillow>=10.0.0
 reportlab>=4.0
 fpdf2>=2.7
 gunicorn>=21.2.0
-
+eventlet==0.33.3
