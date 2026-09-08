@@ -28,6 +28,8 @@ def rate_limit(limit_authenticated: int = 15, limit_guest: int = 3, window_secon
     def decorator(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
+            if request.method == 'OPTIONS':
+                return f(*args, **kwargs)
             try:
                 user_id = get_jwt_identity()
             except Exception:

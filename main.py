@@ -24,7 +24,7 @@ if hasattr(sys.stderr, 'reconfigure'):
     except Exception:
         pass
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
@@ -135,6 +135,20 @@ def create_app():
         }},
     )
 
+    @app.before_request
+    def handle_options_preflight():
+        if request.method == "OPTIONS":
+            res = Response()
+            origin = request.headers.get('Origin', '')
+            if origin:
+                res.headers['Access-Control-Allow-Origin'] = origin
+            else:
+                res.headers['Access-Control-Allow-Origin'] = '*'
+            res.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+            res.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            res.headers['Access-Control-Allow-Credentials'] = 'true'
+            return res, 200
+
     # Flask enforces this before request handlers read multipart bodies. This
     # prevents oversized uploads from being copied to disk first.
     app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD_BYTES
@@ -169,10 +183,10 @@ def create_app():
     # Compatibility blueprint for /auth without /api prefix
     from flask import Blueprint as BP
     auth_compat_bp = BP('auth_compat', __name__, url_prefix='/auth')
-    auth_compat_bp.add_url_rule('/firebase-login', 'firebase_login_compat', firebase_login, methods=['POST', 'OPTIONS'])
-    auth_compat_bp.add_url_rule('/login', 'login_compat', login, methods=['POST', 'OPTIONS'])
-    auth_compat_bp.add_url_rule('/signup', 'signup_compat', signup, methods=['POST', 'OPTIONS'])
-    auth_compat_bp.add_url_rule('/me', 'me_compat', get_current_user, methods=['GET', 'OPTIONS'])
+    auth_compat_bp.add_url_rule('/firebase-login', 'firebase_login_compat', firebase_login, methods=['POST'])
+    auth_compat_bp.add_url_rule('/login', 'login_compat', login, methods=['POST'])
+    auth_compat_bp.add_url_rule('/signup', 'signup_compat', signup, methods=['POST'])
+    auth_compat_bp.add_url_rule('/me', 'me_compat', get_current_user, methods=['GET'])
     app.register_blueprint(auth_compat_bp)
     
     # Phase 2: Document Analysis
@@ -205,7 +219,7 @@ def create_app():
             "status": "running",
             "service": "Presenova AI Presentation Platform",
             "version": "1.1.0",
-            "database": "Firebase Firestore"
+            "database": "Neon PostgreSQL"
         }), 200
 
     @app.route('/api/health', methods=['GET'])

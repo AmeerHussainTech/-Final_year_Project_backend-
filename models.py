@@ -1,144 +1,240 @@
-"""
-Firebase Firestore Database Models (with robust In-Memory Fallback)
-Role: Define helper classes for User, Upload, Report, PresentationSession, and HistoricalReport entities.
-Uses Firestore as primary database, with an in-memory store fallback if Firestore API is offline or disabled.
-"""
-
-import os
+﻿import os
 import json
 from datetime import datetime, timezone
 import uuid
 import logging
 import threading
+from contextlib import contextmanager
 
 from dotenv import load_dotenv
+import psycopg2
+from psycopg2 import pool
+from psycopg2.extras import RealDictCursor, Json
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# ── Thread Lock for In-Memory Storage & State Fallback ───────────────────────
 _store_lock = threading.RLock()
 
-# ── In-Memory Storage Fallback ────────────────────────────────────────────────
 _MEMORY_STORE = {
-    "users": {},                 # id -> dict
-    "uploads": {},               # id -> dict
-    "reports": {},               # id -> dict
-    "presentation_sessions": {}, # id -> dict
-    "historical_reports": {},    # id -> dict
+    "users": {},
+    "uploads": {},
+    "reports": {},
+    "presentation_sessions": {},
+    "historical_reports": {},
 }
 
-_use_firestore = True
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+_db_pool = None
+_use_postgres = False
 
-# ── Firebase Admin SDK setup ─────────────────────────────────────────────────
-import firebase_admin
-from firebase_admin import credentials, firestore as fs
-
-_firebase_app = None
-db = None
-
-def _disable_firestore():
-    global _use_firestore
-    with _store_lock:
-        _use_firestore = False
-
-def _is_firestore_enabled():
-    with _store_lock:
-        return _use_firestore and db is not None
-
-def _init_firebase():
-    global _firebase_app, db
-    if _firebase_app is not None:
+def _init_postgres():
+    global _db_pool, _use_postgres
+    if not DATABASE_URL:
+        print("[DB WARN] DATABASE_URL not set. Operating with in-memory store.")
+        _use_postgres = False
         return
 
-    cred_path = os.getenv('FIREBASE_CREDENTIALS_PATH', 'firebase-service-account.json')
-    cred_json_str = os.getenv('FIREBASE_CREDENTIALS_JSON', '').strip()
-
     try:
-        if cred_json_str:
-            cred_dict = json.loads(cred_json_str)
-            cred = credentials.Certificate(cred_dict)
-            print("[DB OK] Firebase initialized from FIREBASE_CREDENTIALS_JSON env var")
-        elif os.path.exists(cred_path):
-            cred = credentials.Certificate(cred_path)
-            print(f"[DB OK] Firebase initialized from credentials file: {cred_path}")
-        else:
-            print("[DB WARN] Firebase credentials file not found. Using local in-memory database.")
-            _disable_firestore()
-            return
-
-        _firebase_app = firebase_admin.initialize_app(cred)
-        db = fs.client()
-        print("[DB OK] Connected to Firebase Firestore")
-
+        _db_pool = pool.ThreadedConnectionPool(minconn=1, maxconn=10, dsn=DATABASE_URL)
+        _use_postgres = True
+        print("[DB OK] Connected to Neon PostgreSQL Database Pool")
+        _create_tables()
     except Exception as e:
-        print(f"[DB WARN] Firebase initialization error ({str(e)}). Fallback to in-memory database active.")
-        _disable_firestore()
+        print(f"[DB WARN] PostgreSQL connection error: {e}. Fallback to in-memory store active.")
+        _use_postgres = False
 
-_init_firebase()
+def _create_tables():
+    if not _use_postgres or _db_pool is None:
+        return
+    conn = None
+    try:
+        conn = _db_pool.getconn()
+        with conn.cursor() as cur:
+            cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(64) PRIMARY KEY,
+                uid VARCHAR(64),
+                name VARCHAR(255),
+                email VARCHAR(255) UNIQUE NOT NULL,
+                photo_url TEXT,
+                provider VARCHAR(50) DEFAULT 'password',
+                password_hash TEXT,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
+            CREATE TABLE IF NOT EXISTS uploads (
+                id VARCHAR(64) PRIMARY KEY,
+                filename VARCHAR(500),
+                mime_type VARCHAR(100),
+                file_path TEXT,
+                user_id VARCHAR(64),
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_uploads_user_id ON uploads(user_id);
 
-# ── Helper utilities ──────────────────────────────────────────────────────────
+            CREATE TABLE IF NOT EXISTS reports (
+                id VARCHAR(64) PRIMARY KEY,
+                report_json JSONB,
+                report_type VARCHAR(50),
+                user_id VARCHAR(64),
+                upload_id VARCHAR(64),
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_reports_user_id ON reports(user_id);
 
-def _to_dict(doc_snapshot) -> dict | None:
-    if doc_snapshot and doc_snapshot.exists:
-        return doc_snapshot.to_dict()
-    return None
+            CREATE TABLE IF NOT EXISTS presentation_sessions (
+                id VARCHAR(64) PRIMARY KEY,
+                user_id VARCHAR(64),
+                topic VARCHAR(255),
+                status VARCHAR(50),
+                started_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                ended_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                metrics JSONB
+            );
+            CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON presentation_sessions(user_id);
 
+            CREATE TABLE IF NOT EXISTS historical_reports (
+                id VARCHAR(64) PRIMARY KEY,
+                session_id VARCHAR(64),
+                user_id VARCHAR(64),
+                topic VARCHAR(255),
+                report_json JSONB,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_historical_user_topic ON historical_reports(user_id, topic);
+            """)
+        conn.commit()
+        print("[DB OK] PostgreSQL tables and indexes verified successfully")
+    except Exception as e:
+        logger.error(f"[DB ERR] Error creating tables: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            _db_pool.putconn(conn)
 
-def _serialize_dt(dt) -> str | None:
+@contextmanager
+def get_db():
+    global _use_postgres
+    if not _use_postgres or _db_pool is None:
+        yield None
+        return
+
+    conn = None
+    try:
+        conn = _db_pool.getconn()
+        yield conn
+        conn.commit()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        logger.warning(f"[DB ERROR] PostgreSQL query failed ({e}). Fallback active.")
+        raise
+    finally:
+        if conn:
+            _db_pool.putconn(conn)
+
+class CompatDB:
+    def __init__(self):
+        self.is_connected = True
+db = CompatDB()
+
+_init_postgres()
+
+def _serialize_dt(dt):
     if isinstance(dt, datetime):
         return dt.isoformat()
     return str(dt) if dt else None
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# User Model
-# ─────────────────────────────────────────────────────────────────────────────
-
-# ─────────────────────────────────────────────────────────────────────────────
-# User Model
-# ─────────────────────────────────────────────────────────────────────────────
+def _parse_dt(val):
+    if isinstance(val, datetime):
+        return val
+    if isinstance(val, str):
+        try:
+            return datetime.fromisoformat(val)
+        except Exception:
+            pass
+    return datetime.now(timezone.utc)
 
 class User:
-    """User class — maps to Firestore 'users' collection or in-memory fallback."""
-
     def __init__(self, id, uid=None, name="", email="", photo_url=None, provider="password", password_hash=None, created_at=None, updated_at=None):
-        self.id = id
-        self.uid = uid or id
-        self.name = name
-        self.email = email
+        self.id = str(id)
+        self.uid = str(uid or id)
+        self.name = name or ""
+        self.email = email or ""
         self.photo_url = photo_url
         self.provider = provider or "password"
         self.password_hash = password_hash
-        self.created_at = created_at or datetime.now(timezone.utc)
-        self.updated_at = updated_at or datetime.now(timezone.utc)
+        self.created_at = _parse_dt(created_at)
+        self.updated_at = _parse_dt(updated_at)
 
     @staticmethod
-    def get_by_email(email: str) -> "User | None":
+    def get_by_email(email: str):
         email = email.lower().strip()
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                results = list(db.collection("users").where("email", "==", email).limit(1).stream())
-                for doc in results:
-                    d = doc.to_dict()
-                    return User(
-                        id=d.get("id"), uid=d.get("uid") or d.get("id"),
-                        name=d.get("name"), email=d.get("email"),
-                        photo_url=d.get("photo_url"), provider=d.get("provider", "password"),
-                        password_hash=d.get("password_hash"),
-                        created_at=d.get("created_at"), updated_at=d.get("updated_at")
-                    )
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                            cur.execute(
+                                "SELECT id, uid, name, email, photo_url, provider, password_hash, created_at, updated_at FROM users WHERE email = %s LIMIT 1",
+                                (email,)
+                            )
+                            row = cur.fetchone()
+                            if row:
+                                return User(
+                                    id=row["id"], uid=row.get("uid") or row["id"],
+                                    name=row.get("name"), email=row.get("email"),
+                                    photo_url=row.get("photo_url"), provider=row.get("provider", "password"),
+                                    password_hash=row.get("password_hash"),
+                                    created_at=row.get("created_at"), updated_at=row.get("updated_at")
+                                )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on get_by_email: {e}. Switching to in-memory store.")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on User.get_by_email: {e}")
 
-        # In-memory search with thread lock
         with _store_lock:
-            users_list = list(_MEMORY_STORE["users"].values())
+            for u in _MEMORY_STORE["users"].values():
+                if u.get("email") == email:
+                    return User(
+                        id=u.get("id"), uid=u.get("uid") or u.get("id"),
+                        name=u.get("name"), email=u.get("email"),
+                        photo_url=u.get("photo_url"), provider=u.get("provider", "password"),
+                        password_hash=u.get("password_hash"),
+                        created_at=u.get("created_at"), updated_at=u.get("updated_at")
+                    )
+        return None
 
-        for u in users_list:
-            if u.get("email") == email:
+    @staticmethod
+    def get_by_id(user_id: str):
+        user_id = str(user_id)
+        if _use_postgres:
+            try:
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                            cur.execute(
+                                "SELECT id, uid, name, email, photo_url, provider, password_hash, created_at, updated_at FROM users WHERE id = %s LIMIT 1",
+                                (user_id,)
+                            )
+                            row = cur.fetchone()
+                            if row:
+                                return User(
+                                    id=row["id"], uid=row.get("uid") or row["id"],
+                                    name=row.get("name"), email=row.get("email"),
+                                    photo_url=row.get("photo_url"), provider=row.get("provider", "password"),
+                                    password_hash=row.get("password_hash"),
+                                    created_at=row.get("created_at"), updated_at=row.get("updated_at")
+                                )
+            except Exception as e:
+                logger.warning(f"[DB FALLBACK] Postgres error on User.get_by_id: {e}")
+
+        with _store_lock:
+            u = _MEMORY_STORE["users"].get(user_id)
+            if u:
                 return User(
                     id=u.get("id"), uid=u.get("uid") or u.get("id"),
                     name=u.get("name"), email=u.get("email"),
@@ -149,50 +245,22 @@ class User:
         return None
 
     @staticmethod
-    def get_by_id(user_id: str) -> "User | None":
-        if _is_firestore_enabled():
-            try:
-                doc = db.collection("users").document(user_id).get()
-                d = _to_dict(doc)
-                if d:
-                    return User(
-                        id=d.get("id"), uid=d.get("uid") or d.get("id"),
-                        name=d.get("name"), email=d.get("email"),
-                        photo_url=d.get("photo_url"), provider=d.get("provider", "password"),
-                        password_hash=d.get("password_hash"),
-                        created_at=d.get("created_at"), updated_at=d.get("updated_at")
-                    )
-            except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on get_by_id: {e}. Switching to in-memory store.")
-                _disable_firestore()
-
-        # In-memory lookup with thread lock
-        with _store_lock:
-            u = _MEMORY_STORE["users"].get(user_id)
-
-        if u:
-            return User(
-                id=u.get("id"), uid=u.get("uid") or u.get("id"),
-                name=u.get("name"), email=u.get("email"),
-                photo_url=u.get("photo_url"), provider=u.get("provider", "password"),
-                password_hash=u.get("password_hash"),
-                created_at=u.get("created_at"), updated_at=u.get("updated_at")
-            )
-        return None
-
-    @staticmethod
-    def create(name: str, email: str, photo_url: str = None, provider: str = "password", password_hash: str = None) -> "User":
+    def create(name: str, email: str, photo_url: str = None, provider: str = "password", password_hash: str = None):
         user_id = str(uuid.uuid4())
         return User.create_with_id(user_id, name, email, photo_url, provider, password_hash)
 
     @staticmethod
-    def create_with_id(user_id: str, name: str, email: str, photo_url: str = None, provider: str = "password", password_hash: str = None) -> "User":
+    def create_with_id(user_id: str, name: str, email: str, photo_url: str = None, provider: str = "password", password_hash: str = None):
+        user_id = str(user_id)
         now = datetime.now(timezone.utc)
+        clean_name = name.strip() if name else ""
+        clean_email = email.lower().strip() if email else ""
+
         doc = {
             "id": user_id,
             "uid": user_id,
-            "name": name.strip() if name else "",
-            "email": email.lower().strip() if email else "",
+            "name": clean_name,
+            "email": clean_email,
             "photo_url": photo_url,
             "provider": provider or "password",
             "password_hash": password_hash,
@@ -202,20 +270,37 @@ class User:
         with _store_lock:
             _MEMORY_STORE["users"][user_id] = doc
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("users").document(user_id).set(doc, merge=True)
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO users (id, uid, name, email, photo_url, provider, password_hash, created_at, updated_at)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                ON CONFLICT (email) DO UPDATE SET
+                                    name = EXCLUDED.name,
+                                    photo_url = EXCLUDED.photo_url,
+                                    password_hash = COALESCE(EXCLUDED.password_hash, users.password_hash),
+                                    updated_at = EXCLUDED.updated_at
+                                RETURNING id
+                                """,
+                                (user_id, user_id, clean_name, clean_email, photo_url, provider, password_hash, now, now)
+                            )
+                            res = cur.fetchone()
+                            if res:
+                                user_id = str(res[0])
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on User.create_with_id: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on User.create_with_id: {e}")
 
         return User(
-            id=user_id, uid=user_id, name=name, email=email,
+            id=user_id, uid=user_id, name=clean_name, email=clean_email,
             photo_url=photo_url, provider=provider, password_hash=password_hash,
             created_at=now, updated_at=now
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "id": self.id,
             "uid": self.uid,
@@ -227,50 +312,53 @@ class User:
             "updated_at": _serialize_dt(self.updated_at),
         }
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Upload Model
-# ─────────────────────────────────────────────────────────────────────────────
-
 class Upload:
-    """Upload class — maps to Firestore 'uploads' collection or in-memory fallback."""
-
     def __init__(self, id, filename, mime_type, file_path, user_id, created_at=None):
-        self.id = id
+        self.id = str(id)
         self.filename = filename
         self.mime_type = mime_type
         self.file_path = file_path
-        self.user_id = user_id
-        self.created_at = created_at or datetime.now(timezone.utc)
+        self.user_id = str(user_id) if user_id else ""
+        self.created_at = _parse_dt(created_at)
 
     @staticmethod
-    def create(filename: str, mime_type: str, file_path: str, user_id: str) -> "Upload":
+    def create(filename: str, mime_type: str, file_path: str, user_id: str):
         upload_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
+        user_id_str = str(user_id) if user_id else ""
+
         doc = {
             "id": upload_id,
             "filename": filename,
             "mime_type": mime_type,
             "file_path": file_path,
-            "user_id": user_id,
+            "user_id": user_id_str,
             "created_at": now,
         }
         with _store_lock:
             _MEMORY_STORE["uploads"][upload_id] = doc
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("uploads").document(upload_id).set(doc)
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO uploads (id, filename, mime_type, file_path, user_id, created_at)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                """,
+                                (upload_id, filename, mime_type, file_path, user_id_str, now)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on Upload.create: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on Upload.create: {e}")
 
         return Upload(
             id=upload_id, filename=filename, mime_type=mime_type,
-            file_path=file_path, user_id=user_id, created_at=now
+            file_path=file_path, user_id=user_id_str, created_at=now
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "id": self.id,
             "filename": self.filename,
@@ -279,92 +367,93 @@ class Upload:
             "created_at": _serialize_dt(self.created_at),
         }
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Report Model
-# ─────────────────────────────────────────────────────────────────────────────
-
 class Report:
-    """Report class — maps to Firestore 'reports' collection or in-memory fallback."""
-
-    def __init__(self, id, report_json, report_type, user_id, upload_id=None,
-                 created_at=None, updated_at=None):
-        self.id = id
-        self.report_json = report_json
-        self.report_type = report_type
-        self.user_id = user_id
-        self.upload_id = upload_id
-        self.created_at = created_at or datetime.now(timezone.utc)
-        self.updated_at = updated_at or datetime.now(timezone.utc)
+    def __init__(self, id, report_json, report_type, user_id, upload_id=None, created_at=None, updated_at=None):
+        self.id = str(id)
+        self.report_json = report_json or {}
+        self.report_type = report_type or ""
+        self.user_id = str(user_id) if user_id else ""
+        self.upload_id = str(upload_id) if upload_id else None
+        self.created_at = _parse_dt(created_at)
+        self.updated_at = _parse_dt(updated_at)
 
     @staticmethod
-    def create(report_json: dict, report_type: str, user_id: str,
-               upload_id: str | None = None) -> "Report":
+    def create(report_json: dict, report_type: str, user_id: str, upload_id: str = None):
         report_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
+        user_id_str = str(user_id) if user_id else ""
+        upload_id_str = str(upload_id) if upload_id else None
+
         doc = {
             "id": report_id,
             "report_json": report_json,
             "report_type": report_type,
-            "user_id": user_id,
-            "upload_id": upload_id,
+            "user_id": user_id_str,
+            "upload_id": upload_id_str,
             "created_at": now,
             "updated_at": now,
         }
         with _store_lock:
             _MEMORY_STORE["reports"][report_id] = doc
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("reports").document(report_id).set(doc)
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO reports (id, report_json, report_type, user_id, upload_id, created_at, updated_at)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                """,
+                                (report_id, Json(report_json), report_type, user_id_str, upload_id_str, now, now)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on Report.create: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on Report.create: {e}")
 
         return Report(
             id=report_id, report_json=report_json, report_type=report_type,
-            user_id=user_id, upload_id=upload_id, created_at=now, updated_at=now
+            user_id=user_id_str, upload_id=upload_id_str, created_at=now, updated_at=now
         )
 
     @staticmethod
-    def get_by_user(user_id: str) -> list["Report"]:
-        if _is_firestore_enabled():
+    def get_by_user(user_id: str):
+        user_id_str = str(user_id) if user_id else ""
+        if _use_postgres:
             try:
-                results = list(
-                    db.collection("reports")
-                    .where("user_id", "==", user_id)
-                    .stream()
-                )
-                reports = []
-                for doc in results:
-                    d = doc.to_dict()
-                    reports.append(Report(
-                        id=d.get("id"), report_json=d.get("report_json"),
-                        report_type=d.get("report_type"), user_id=d.get("user_id"),
-                        upload_id=d.get("upload_id"), created_at=d.get("created_at"),
-                        updated_at=d.get("updated_at")
-                    ))
-                return reports
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                            cur.execute(
+                                "SELECT id, report_json, report_type, user_id, upload_id, created_at, updated_at FROM reports WHERE user_id = %s ORDER BY created_at DESC",
+                                (user_id_str,)
+                            )
+                            rows = cur.fetchall()
+                            reports = []
+                            for row in rows:
+                                reports.append(Report(
+                                    id=row["id"], report_json=row.get("report_json"),
+                                    report_type=row.get("report_type"), user_id=row.get("user_id"),
+                                    upload_id=row.get("upload_id"), created_at=row.get("created_at"),
+                                    updated_at=row.get("updated_at")
+                                ))
+                            return reports
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on Report.get_by_user: {e}")
-                _disable_firestore()
-
-        # In-memory search with thread lock
-        with _store_lock:
-            reports_list = list(_MEMORY_STORE["reports"].values())
+                logger.warning(f"[DB FALLBACK] Postgres error on Report.get_by_user: {e}")
 
         reports = []
-        for r in reports_list:
-            if r.get("user_id") == user_id:
-                reports.append(Report(
-                    id=r.get("id"), report_json=r.get("report_json"),
-                    report_type=r.get("report_type"), user_id=r.get("user_id"),
-                    upload_id=r.get("upload_id"), created_at=r.get("created_at"),
-                    updated_at=r.get("updated_at")
-                ))
+        with _store_lock:
+            for r in _MEMORY_STORE["reports"].values():
+                if r.get("user_id") == user_id_str:
+                    reports.append(Report(
+                        id=r.get("id"), report_json=r.get("report_json"),
+                        report_type=r.get("report_type"), user_id=r.get("user_id"),
+                        upload_id=r.get("upload_id"), created_at=r.get("created_at"),
+                        updated_at=r.get("updated_at")
+                    ))
         return sorted(reports, key=lambda x: str(x.created_at), reverse=True)
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "id": self.id,
             "report_type": self.report_type,
@@ -374,21 +463,14 @@ class Report:
             "created_at": _serialize_dt(self.created_at),
         }
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# PresentationSession Model
-# ─────────────────────────────────────────────────────────────────────────────
-
 class PresentationSession:
-    """PresentationSession — maps to Firestore 'presentation_sessions' collection."""
-
     def __init__(self, id, user_id, topic, status, started_at=None, ended_at=None, metrics=None):
-        self.id = id
-        self.user_id = user_id
-        self.topic = topic
-        self.status = status
-        self.started_at = started_at or datetime.now(timezone.utc)
-        self.ended_at = ended_at or datetime.now(timezone.utc)
+        self.id = str(id)
+        self.user_id = str(user_id) if user_id else ""
+        self.topic = topic or ""
+        self.status = status or "STREAMING"
+        self.started_at = _parse_dt(started_at)
+        self.ended_at = _parse_dt(ended_at)
         self.metrics = metrics or {
             "eye_contact_scores": [],
             "posture_scores": [],
@@ -401,9 +483,10 @@ class PresentationSession:
         }
 
     @staticmethod
-    def create(user_id: str, topic: str) -> "PresentationSession":
+    def create(user_id: str, topic: str):
         session_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
+        user_id_str = str(user_id) if user_id else ""
         default_metrics = {
             "eye_contact_scores": [],
             "posture_scores": [],
@@ -416,7 +499,7 @@ class PresentationSession:
         }
         doc = {
             "id": session_id,
-            "user_id": user_id,
+            "user_id": user_id_str,
             "topic": topic,
             "status": "STREAMING",
             "started_at": now,
@@ -426,48 +509,61 @@ class PresentationSession:
         with _store_lock:
             _MEMORY_STORE["presentation_sessions"][session_id] = doc
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("presentation_sessions").document(session_id).set(doc)
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO presentation_sessions (id, user_id, topic, status, started_at, ended_at, metrics)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                """,
+                                (session_id, user_id_str, topic, "STREAMING", now, now, Json(default_metrics))
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on PresentationSession.create: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on PresentationSession.create: {e}")
 
         return PresentationSession(
-            id=session_id, user_id=user_id, topic=topic,
+            id=session_id, user_id=user_id_str, topic=topic,
             status="STREAMING", started_at=now, ended_at=now, metrics=default_metrics
         )
 
     @staticmethod
-    def get_by_id(session_id: str) -> "PresentationSession | None":
-        if _is_firestore_enabled():
+    def get_by_id(session_id: str):
+        session_id_str = str(session_id)
+        if _use_postgres:
             try:
-                doc = db.collection("presentation_sessions").document(session_id).get()
-                d = _to_dict(doc)
-                if d:
-                    return PresentationSession(
-                        id=d.get("id"), user_id=d.get("user_id"),
-                        topic=d.get("topic"), status=d.get("status"),
-                        started_at=d.get("started_at"), ended_at=d.get("ended_at"),
-                        metrics=d.get("metrics")
-                    )
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                            cur.execute(
+                                "SELECT id, user_id, topic, status, started_at, ended_at, metrics FROM presentation_sessions WHERE id = %s LIMIT 1",
+                                (session_id_str,)
+                            )
+                            row = cur.fetchone()
+                            if row:
+                                return PresentationSession(
+                                    id=row["id"], user_id=row.get("user_id"),
+                                    topic=row.get("topic"), status=row.get("status"),
+                                    started_at=row.get("started_at"), ended_at=row.get("ended_at"),
+                                    metrics=row.get("metrics")
+                                )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on PresentationSession.get_by_id: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on PresentationSession.get_by_id: {e}")
 
         with _store_lock:
-            s = _MEMORY_STORE["presentation_sessions"].get(session_id)
-
-        if s:
-            return PresentationSession(
-                id=s.get("id"), user_id=s.get("user_id"),
-                topic=s.get("topic"), status=s.get("status"),
-                started_at=s.get("started_at"), ended_at=s.get("ended_at"),
-                metrics=s.get("metrics")
-            )
+            s = _MEMORY_STORE["presentation_sessions"].get(session_id_str)
+            if s:
+                return PresentationSession(
+                    id=s.get("id"), user_id=s.get("user_id"),
+                    topic=s.get("topic"), status=s.get("status"),
+                    started_at=s.get("started_at"), ended_at=s.get("ended_at"),
+                    metrics=s.get("metrics")
+                )
         return None
 
-    def update_metrics(self, key: str, value) -> None:
+    def update_metrics(self, key: str, value):
         if self.metrics and key in self.metrics:
             if isinstance(self.metrics[key], list):
                 self.metrics[key].append(value)
@@ -476,15 +572,19 @@ class PresentationSession:
             if self.id in _MEMORY_STORE["presentation_sessions"]:
                 _MEMORY_STORE["presentation_sessions"][self.id]["metrics"] = self.metrics
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                ref = db.collection("presentation_sessions").document(self.id)
-                ref.update({f"metrics.{key}": fs.ArrayUnion([value])})
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                "UPDATE presentation_sessions SET metrics = %s WHERE id = %s",
+                                (Json(self.metrics), self.id)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore update_metrics error: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres update_metrics error: {e}")
 
-    def increment_metric(self, key: str, val: int = 1) -> None:
+    def increment_metric(self, key: str, val: int = 1):
         if self.metrics and key in self.metrics:
             self.metrics[key] = self.metrics.get(key, 0) + val
 
@@ -492,33 +592,41 @@ class PresentationSession:
             if self.id in _MEMORY_STORE["presentation_sessions"]:
                 _MEMORY_STORE["presentation_sessions"][self.id]["metrics"] = self.metrics
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                ref = db.collection("presentation_sessions").document(self.id)
-                ref.update({f"metrics.{key}": fs.Increment(val)})
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                "UPDATE presentation_sessions SET metrics = %s WHERE id = %s",
+                                (Json(self.metrics), self.id)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore increment_metric error: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres increment_metric error: {e}")
 
-    def update_status(self, new_status: str) -> None:
+    def update_status(self, new_status: str):
         self.status = new_status
         now = datetime.now(timezone.utc)
+        self.ended_at = now
+
         with _store_lock:
             if self.id in _MEMORY_STORE["presentation_sessions"]:
                 _MEMORY_STORE["presentation_sessions"][self.id]["status"] = new_status
                 _MEMORY_STORE["presentation_sessions"][self.id]["ended_at"] = now
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("presentation_sessions").document(self.id).update({
-                    "status": new_status,
-                    "ended_at": now,
-                })
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                "UPDATE presentation_sessions SET status = %s, ended_at = %s WHERE id = %s",
+                                (new_status, now, self.id)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore update_status error: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres update_status error: {e}")
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -529,87 +637,92 @@ class PresentationSession:
             "metrics": self.metrics,
         }
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# HistoricalReport Model
-# ─────────────────────────────────────────────────────────────────────────────
-
 class HistoricalReport:
-    """HistoricalReport — maps to Firestore 'historical_reports' collection."""
-
     def __init__(self, id, session_id, user_id, topic, report_json, created_at=None):
-        self.id = id
-        self.session_id = session_id
-        self.user_id = user_id
-        self.topic = topic
-        self.report_json = report_json
-        self.created_at = created_at or datetime.now(timezone.utc)
+        self.id = str(id)
+        self.session_id = str(session_id) if session_id else ""
+        self.user_id = str(user_id) if user_id else ""
+        self.topic = topic or ""
+        self.report_json = report_json or {}
+        self.created_at = _parse_dt(created_at)
 
     @staticmethod
-    def create(session_id: str, user_id: str, topic: str, report_json: dict) -> "HistoricalReport":
+    def create(session_id: str, user_id: str, topic: str, report_json: dict):
         report_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
+        clean_topic = topic.strip().lower() if topic else ""
+        user_id_str = str(user_id) if user_id else ""
+        session_id_str = str(session_id) if session_id else ""
+
         doc = {
             "id": report_id,
-            "session_id": session_id,
-            "user_id": user_id,
-            "topic": topic.strip().lower(),
+            "session_id": session_id_str,
+            "user_id": user_id_str,
+            "topic": clean_topic,
             "report_json": report_json,
             "created_at": now,
         }
         with _store_lock:
             _MEMORY_STORE["historical_reports"][report_id] = doc
 
-        if _is_firestore_enabled():
+        if _use_postgres:
             try:
-                db.collection("historical_reports").document(report_id).set(doc)
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                """
+                                INSERT INTO historical_reports (id, session_id, user_id, topic, report_json, created_at)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                """,
+                                (report_id, session_id_str, user_id_str, clean_topic, Json(report_json), now)
+                            )
             except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on HistoricalReport.create: {e}")
-                _disable_firestore()
+                logger.warning(f"[DB FALLBACK] Postgres error on HistoricalReport.create: {e}")
 
         return HistoricalReport(
-            id=report_id, session_id=session_id, user_id=user_id,
+            id=report_id, session_id=session_id_str, user_id=user_id_str,
             topic=topic, report_json=report_json, created_at=now
         )
 
     @staticmethod
-    def get_by_user_and_topic(user_id: str, topic: str) -> list["HistoricalReport"]:
-        topic_lower = topic.strip().lower()
-        if _is_firestore_enabled():
-            try:
-                results = list(
-                    db.collection("historical_reports")
-                    .where("user_id", "==", user_id)
-                    .where("topic", "==", topic_lower)
-                    .stream()
-                )
-                reports = []
-                for doc in results:
-                    d = doc.to_dict()
-                    reports.append(HistoricalReport(
-                        id=d.get("id"), session_id=d.get("session_id"),
-                        user_id=d.get("user_id"), topic=d.get("topic"),
-                        report_json=d.get("report_json"), created_at=d.get("created_at")
-                    ))
-                return reports
-            except Exception as e:
-                logger.warning(f"[DB FALLBACK] Firestore error on get_by_user_and_topic: {e}")
-                _disable_firestore()
+    def get_by_user_and_topic(user_id: str, topic: str):
+        topic_lower = topic.strip().lower() if topic else ""
+        user_id_str = str(user_id) if user_id else ""
 
-        with _store_lock:
-            hr_list = list(_MEMORY_STORE["historical_reports"].values())
+        if _use_postgres:
+            try:
+                with get_db() as conn:
+                    if conn:
+                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                            cur.execute(
+                                "SELECT id, session_id, user_id, topic, report_json, created_at FROM historical_reports WHERE user_id = %s AND LOWER(topic) = %s ORDER BY created_at DESC",
+                                (user_id_str, topic_lower)
+                            )
+                            rows = cur.fetchall()
+                            reports = []
+                            for row in rows:
+                                reports.append(HistoricalReport(
+                                    id=row["id"], session_id=row.get("session_id"),
+                                    user_id=row.get("user_id"), topic=row.get("topic"),
+                                    report_json=row.get("report_json"), created_at=row.get("created_at")
+                                ))
+                            return reports
+            except Exception as e:
+                logger.warning(f"[DB FALLBACK] Postgres error on get_by_user_and_topic: {e}")
 
         reports = []
-        for hr in hr_list:
-            if hr.get("user_id") == user_id and hr.get("topic") == topic_lower:
-                reports.append(HistoricalReport(
-                    id=hr.get("id"), session_id=hr.get("session_id"),
-                    user_id=hr.get("user_id"), topic=hr.get("topic"),
-                    report_json=hr.get("report_json"), created_at=hr.get("created_at")
-                ))
+        with _store_lock:
+            for hr in _MEMORY_STORE["historical_reports"].values():
+                if hr.get("user_id") == user_id_str and hr.get("topic") == topic_lower:
+                    reports.append(HistoricalReport(
+                        id=hr.get("id"), session_id=hr.get("session_id"),
+                        user_id=hr.get("user_id"), topic=hr.get("topic"),
+                        report_json=hr.get("report_json"), created_at=hr.get("created_at")
+                    ))
         return sorted(reports, key=lambda x: str(x.created_at), reverse=True)
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "id": self.id,
             "session_id": self.session_id,
